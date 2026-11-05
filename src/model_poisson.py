@@ -10,6 +10,7 @@ Implementa:
 """
 import math
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from typing import Optional
 import config
 
@@ -299,6 +300,19 @@ def evaluar_oportunidad_prop(
         ("UNDER", playdoit_under_odds, model_p_under, sharp_adj_under, blended_under, config.MIN_EV_UNDER),
         ("OVER", playdoit_over_odds, model_p_over, sharp_adj_over, blended_over, config.MIN_EV_OVER),
     ]
+
+    # Regla de Horario (Mañana vs. Tarde):
+    # - En la Mañana (8:00 AM a 11:59 AM CDMX = 14:00 a 17:59 UTC): se cazan errores de apertura.
+    # - En la Tarde (después de las 12:00 PM CDMX): el mercado ya ajustó las aperturas; SOLO vale la pena
+    #   disparar si hay una baja recién confirmada (is_breaking_injury) o si Playdoit tiene la línea
+    #   atrasada por al menos medio punto (>= 0.5 pts) frente a FanDuel.
+    hora_utc = datetime.now(timezone.utc).hour
+    es_ventana_manana = 13 <= hora_utc <= 17
+    hay_desfase_de_linea = abs(sharp_line - playdoit_line) >= 0.5
+    hay_catalizador_nuevo = bool(inp.is_breaking_injury or inp.minutes_cap_news)
+
+    if not es_ventana_manana and not (hay_desfase_de_linea or hay_catalizador_nuevo):
+        return None
 
     mejor_resultado: Optional[PropEvaluationResult] = None
 
