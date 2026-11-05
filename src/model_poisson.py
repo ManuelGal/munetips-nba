@@ -214,15 +214,15 @@ def calcular_score_1_a_10(
     Toda jugada que ya superó el umbral estricto de EV (+4.2% en UNDER o +6.0% en OVER)
     arranca en base 5.5 y suma puntos por magnitud de EV, diferencia de línea y reglas de Playdoit.
     """
-    # Base para apuestas con EV positivo comprobado
-    if ev_pct < 0.042:
-        pts_ev = 4.0 + (ev_pct / 0.042) * 1.5
+    # Base para apuestas con EV neto positivo comprobado sobre la línea sin vig de FanDuel
+    if ev_pct < 0.015:
+        pts_ev = 4.5 + (ev_pct / 0.015) * 1.0
+    elif ev_pct < 0.035:
+        pts_ev = 5.8 + ((ev_pct - 0.015) / 0.020) * 1.1
     elif ev_pct < 0.065:
-        pts_ev = 5.6 + ((ev_pct - 0.042) / 0.023) * 1.0
-    elif ev_pct < 0.10:
-        pts_ev = 6.6 + ((ev_pct - 0.065) / 0.035) * 1.1
+        pts_ev = 6.9 + ((ev_pct - 0.035) / 0.030) * 1.0
     else:
-        pts_ev = min(8.2, 7.7 + (ev_pct - 0.10) * 4.0)
+        pts_ev = min(8.5, 7.9 + (ev_pct - 0.065) * 5.0)
 
     ventaja_puntos = (sharp_line - playdoit_line) if side == "OVER" else (playdoit_line - sharp_line)
     if ventaja_puntos >= 1.0:
