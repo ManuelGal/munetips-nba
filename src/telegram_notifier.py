@@ -16,7 +16,16 @@ def formatear_mensaje_munetips(op: PropEvaluationResult) -> str:
     Construye el mensaje exacto que llega al canal 'Muñetips' en el celular,
     destacando la escala del 1 al 10 y la probabilidad real del modelo.
     """
-    mercado_es = "Rebotes" if op.market_type == "player_rebounds" else "Asistencias"
+    if op.market_type == "player_points":
+        mercado_es = "Puntos"
+        pestana_playdoit = "Puntos de Jugador Más de/Menos de (incl. prórroga)"
+    elif op.market_type == "player_rebounds":
+        mercado_es = "Rebotes"
+        pestana_playdoit = "Rebotes de Jugador Más de/Menos de (incl. prórroga)"
+    else:
+        mercado_es = "Asistencias"
+        pestana_playdoit = "Asistencias de Jugador Más de/Menos de (incl. prórroga)"
+
     momio_am = decimal_a_americano(op.playdoit_odds)
     min_am = decimal_a_americano(op.min_acceptable_odds)
 
@@ -50,8 +59,9 @@ def formatear_mensaje_munetips(op: PropEvaluationResult) -> str:
         f"━━━━━━━━━━━━━━━━━━━━━━\n"
         f"🏀 *Partido:* {op.team_abbr} vs {op.opponent_abbr}\n"
         f"👤 *Jugador:* *{op.player_name}* ({op.team_abbr})\n"
-        f"🎯 *Apuesta en Playdoit:* *{op.side} {op.playdoit_line} {mercado_es}*\n"
-        f"💰 *Cuota Playdoit:* `{op.playdoit_odds:.2f}` (`{momio_am}`)\n"
+        f"📂 *Pestaña Playdoit:* _{pestana_playdoit}_\n"
+        f"🎯 *Apuesta:* *{op.side} {op.playdoit_line} {mercado_es}*\n"
+        f"💰 *Cuota detectada:* `{op.playdoit_odds:.2f}` (`{momio_am}`)\n"
         f"🛑 *Cuota mínima aceptable:* `{op.min_acceptable_odds:.2f}` (`{min_am}`) _(Cumple regla >= -130)_\n"
         f"━━━━━━━━━━━━━━━━━━━━━━\n"
         f"📊 *Proyección Poisson:* `{op.projected_mean_lambda:.2f}` {mercado_es.lower()} en `{op.projected_minutes:.1f}` min\n"
