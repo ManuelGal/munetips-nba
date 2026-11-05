@@ -173,6 +173,7 @@ def _procesar_libro_evento(
         equipo_jug = perfil.team_abbr if perfil else ctx.home_team
         rival_jug = ctx.away_team if equipo_jug == ctx.home_team else ctx.home_team
         baja_equipo = titulares_baja_por_equipo.get(equipo_jug)
+        es_baja_reciente = bool(baja_equipo and "RECIÉN DESCARTADO" in baja_equipo.injury_detail)
 
         inp = PlayerProjectionInput(
             player_name=libros["raw_name"],
@@ -187,7 +188,8 @@ def _procesar_libro_evento(
             game_spread=ctx.home_spread,
             teammate_out_name=baja_equipo.player_name if baja_equipo else None,
             teammate_out_minutes=baja_equipo.avg_minutes if baja_equipo else 0.0,
-            usage_boost_factor=1.06 if baja_equipo else 1.0,
+            is_breaking_injury=es_baja_reciente,
+            usage_boost_factor=1.06 if es_baja_reciente else 1.0,
             is_two_way_contract=perfil.is_two_way if perfil else False,
         )
 
