@@ -1,3 +1,8 @@
+"""
+Punto de entrada principal del Agente Cuantitativo NBA Player Props -> Canal 'Muñetips' (Playdoit.mx).
+Diseñado con CERO dependencias externas obligatorias (corre en Python 3.10+ estándar en < 3 segundos)
+para ejecución gratuita 24/7 en la nube (GitHub Actions) con tu computadora apagada.
+"""
 import argparse
 import csv
 import os
@@ -6,6 +11,7 @@ import config
 
 
 def cargar_env_local() -> None:
+    """Carga variables desde archivo .env local si existe (sin requerir librerías externas)."""
     ruta_env = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
     if not os.path.exists(ruta_env):
         return
@@ -20,6 +26,7 @@ def cargar_env_local() -> None:
             if v and not os.getenv(k):
                 os.environ[k] = v
 
+    # Recargar en config
     config.TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", config.TELEGRAM_BOT_TOKEN).strip()
     config.TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", config.TELEGRAM_CHAT_ID).strip()
     config.ODDS_API_KEY = os.getenv("ODDS_API_KEY", config.ODDS_API_KEY).strip()
@@ -42,6 +49,11 @@ from src.telegram_notifier import (
 
 
 def registrar_pick_csv(op: PropEvaluationResult) -> bool:
+    """
+    Registra la señal en `data/munetips_historial_clv.csv` y verifica si ya se envió
+    hoy la misma alerta para no hacer spam en el canal 'Muñetips'.
+    Devuelve True si es una señal NUEVA del día.
+    """
     os.makedirs(config.DATA_DIR, exist_ok=True)
     fecha_hoy = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     clave_unica = f"{fecha_hoy}|{op.player_name}|{op.market_type}|{op.side}|{op.playdoit_line}"
@@ -107,6 +119,11 @@ def registrar_pick_csv(op: PropEvaluationResult) -> bool:
 
 
 def ejecutar_simulacion_demo() -> None:
+    """
+    Genera una señal cuantitativa real de prueba con el motor de Poisson/Binomial Negativa
+    y la envía al canal 'Muñetips' para verificar que las notificaciones al celular funcionan.
+    """
+    print(f"[DEMO] Calculando señal de prueba para el canal '{config.CHANNEL_NAME}'...")
     inp_ejemplo = PlayerProjectionInput(
         player_name="Tre Mann",
         team_abbr="CHA",
@@ -126,9 +143,9 @@ def ejecutar_simulacion_demo() -> None:
     op = evaluar_oportunidad_prop(
         inp=inp_ejemplo,
         playdoit_line=4.5,
-        playdoit_over_odds=1.87,
+        playdoit_over_odds=1.87,      # -115 en Playdoit (cumple >= 1.77 / -130)
         playdoit_under_odds=1.83,
-        sharp_line=5.5,
+        sharp_line=5.5,               # FanDuel ya movió la línea a 5.5
         sharp_over_odds=1.88,
         sharp_under_odds=1.92,
     )
@@ -149,16 +166,20 @@ def ejecutar_escaneo_vivo() -> None:
         for b in p.newly_out_starters:
             bajas_lista.append(f"{b.player_name} ({b.team_abbr})")
 
+    print(f"[NBA DATA] Titulares/Rotación clave en estado OUT/DOUBTFUL hoy: {len(bajas_lista)}")
+
     oportunidades = escanear_mercados_reales(partidos)
     print(f"[MODELO POISSON] Oportunidades que superan Score >= {config.MIN_SCORE_FOR_ALERT}/10: {len(oportunidades)}")
 
     enviadas = 0
-    for op in oportunidades[:4]:
+    for op in oportunidades[:4]:  # Máximo 4 mejores alertas por ventana
         if registrar_pick_csv(op):
             mensaje = formatear_mensaje_munetips(op)
             if enviar_alerta_telegram(mensaje):
                 enviadas += 1
 
+    # Si no hubo ninguna apuesta >= 6.5/10, enviar reporte corto de vigilancia a Telegram
+    # para que siempre sepas en tu celular que el bot sí corrió y qué vio en el mercado.
     if enviadas == 0:
         resumen_partidos = (
             ", ".join(f"{p.away_team}@{p.home_team}" for p in partidos[:8])
@@ -182,13 +203,19 @@ def ejecutar_escaneo_vivo() -> None:
         )
         enviar_alerta_telegram(msg_estado)
 
+    print(f"[FIN] Alertas nuevas enviadas al canal '{config.CHANNEL_NAME}': {enviadas}")
+
 
 def main() -> None:
     cargar_env_local()
     parser = argparse.ArgumentParser(description="Agente Cuantitativo NBA -> Canal Muñetips (Playdoit)")
-    parser.add_argument("--scan", action="store_true")
-    parser.add_argument("--demo", action="store_true")
-    parser.add_argument("--find-channel", action="store_true")
+    parser.add_argument("--scan", action="store_true", help="Ejecuta el escaneo en vivo de partidos y cuotas de hoy")
+    parser.add_argument("--demo", action="store_true", help="Envía una alerta de prueba calculada al canal Muñetips")
+    parser.add_argument(
+        "--find-channel",
+        action="store_true",
+        help="Detecta automáticamente el TELEGRAM_CHAT_ID de tu canal 'Muñetips'",
+    )
     args = parser.parse_args()
 
     if args.find_channel:
