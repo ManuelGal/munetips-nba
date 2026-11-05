@@ -32,15 +32,14 @@ USE_LLM_NEWS_CHECK = bool(GEMINI_API_KEY)
 MIN_PLAYDOIT_ODDS_DECIMAL = 1.77
 MAX_PLAYDOIT_ODDS_DECIMAL = 2.45
 
-# Asimetría de reglas de lesión en Playdoit (NO tiene Prop Protect como bet365):
-# - Como el modelo ya ancla a la línea sin vig de FanDuel y aplica ±1.8% por regla de lesión:
-# - En UNDER: exigimos +1.5% de ventaja neta sobre FanDuel sin vig.
-# - En OVER: exigimos +2.5% de ventaja neta sobre FanDuel sin vig (tras descontar -1.8% de lesión).
-MIN_EV_OVER = 0.025   # +2.5% Valor Esperado neto mínimo para OVERS
-MIN_EV_UNDER = 0.015  # +1.5% Valor Esperado neto mínimo para UNDERS
+# Filtro estricto de ventaja matemática (sin aflojar en la tarde):
+# - En la mañana (apertura): exige >= +4.5% EV en UNDER o >= +5.5% EV en OVER.
+# - En la tarde: exige que además exista baja nueva del día o desfase >= 0.5 puntos vs FanDuel.
+MIN_EV_OVER = 0.055   # +5.5% Valor Esperado neto mínimo para OVERS
+MIN_EV_UNDER = 0.045  # +4.5% Valor Esperado neto mínimo para UNDERS
 
-# Filtro de alerta al celular: solo notificar en "Muñetips" si el Score (1 a 10) >= 6.5
-MIN_SCORE_FOR_ALERT = 6.5
+# Filtro de alerta al celular: solo notificar en "Muñetips" si el Score (1 a 10) >= 7.0
+MIN_SCORE_FOR_ALERT = 7.0
 
 # ==============================================================================
 # 4. GESTIÓN DE BANCA Y CAMUFLAJE ANTI-LIMITACIÓN (ALTENAR)
