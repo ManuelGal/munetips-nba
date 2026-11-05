@@ -1,6 +1,6 @@
 """
 Punto de entrada principal del Agente Cuantitativo NBA Player Props -> Canal 'Muñetips' (Playdoit.mx).
-Diseñado con CERO dependencias externas obligatorias (corre en Python 3.10+ estándar en < 3 segundos)
+Diseñado con CERO dependencias externas obligatorias (corre en Python 3.10+ estándar)
 para ejecución gratuita 24/7 en la nube (GitHub Actions) con tu computadora apagada.
 """
 import argparse
@@ -135,8 +135,10 @@ def ejecutar_simulacion_demo() -> None:
         team_pace=101.8,
         opp_pace=103.2,
         game_spread=-4.5,
+        position="PG",
         teammate_out_name="LaMelo Ball",
         teammate_out_minutes=33.5,
+        is_breaking_injury=True,
         usage_boost_factor=1.15,
     )
 
@@ -156,17 +158,23 @@ def ejecutar_simulacion_demo() -> None:
 
 
 def ejecutar_escaneo_vivo() -> None:
-    ahora_str = datetime.now().strftime("%H:%M UTC")
+    ahora_str = datetime.now(timezone.utc).strftime("%H:%M UTC")
     print(f"[{ahora_str}] Iniciando escaneo NBA -> Canal '{config.CHANNEL_NAME}'...")
     partidos = obtener_contexto_partidos_hoy()
     print(f"[NBA DATA] Partidos encontrados hoy: {len(partidos)}")
 
     bajas_lista = []
+    bajas_recientes = []
     for p in partidos:
         for b in p.newly_out_starters:
-            bajas_lista.append(f"{b.player_name} ({b.team_abbr})")
+            bajas_lista.append(f"{b.player_name} ({b.team_abbr}, {b.position}, {b.avg_minutes:.1f}m)")
+            if b.is_newly_out:
+                bajas_recientes.append(f"{b.player_name} ({b.team_abbr})")
 
-    print(f"[NBA DATA] Titulares/Rotación clave en estado OUT/DOUBTFUL hoy: {len(bajas_lista)}")
+    print(
+        f"[NBA DATA] Titulares/Rotación clave en estado OUT/DOUBTFUL hoy: {len(bajas_lista)} "
+        f"(Recién descartados en esta ventana: {len(bajas_recientes)})"
+    )
 
     oportunidades = escanear_mercados_reales(partidos)
     print(f"[MODELO POISSON] Oportunidades que superan Score >= {config.MIN_SCORE_FOR_ALERT}/10: {len(oportunidades)}")

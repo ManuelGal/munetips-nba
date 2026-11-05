@@ -2,13 +2,12 @@
 Filtro de Noticias de Ultra-Bajo Consumo de Tokens (Opcional, Tier Gratuito de Gemini Flash).
 REGLA DE ARQUITECTURA:
 - Este módulo NUNCA se ejecuta para escanear el mercado (eso lo hace Python con 0 tokens).
-- Solo se invoca cuando una apuesta YA superó el filtro matemático (Score >= 6.5),
+- Solo se invoca cuando una apuesta YA superó el filtro matemático (Score >= 7.0),
   consumiendo ~120 tokens para validar restricciones de minutos y pulir la nota táctica.
 - Si no hay GEMINI_API_KEY configurada, opera al 100% con reglas deterministas (0 tokens).
 """
 import json
 import urllib.request
-from typing import Optional
 import config
 
 
@@ -27,10 +26,16 @@ def verificar_nota_tactica_min_tokens(
     if not config.USE_LLM_NEWS_CHECK or not config.GEMINI_API_KEY:
         return catalyst_reason
 
-    mercado_es = "Rebotes" if "rebound" in market_type else "Asistencias"
+    if market_type == "player_points":
+        mercado_es = "Puntos"
+    elif market_type == "player_rebounds":
+        mercado_es = "Rebotes"
+    else:
+        mercado_es = "Asistencias"
+
     prompt = (
-        f"Eres analista cuantitativo NBA. Resume en 1 sola frase directa (máx 22 palabras, español) "
-        f"por qué {side} {line} {mercado_es} de {player_name} ({team_abbr}) tiene ventaja hoy en Playdoit: "
+        f"Eres analista cuantitativo NBA. Resume en 1 sola frase directa (máx 20 palabras, español) "
+        f"por qué {side} {line} {mercado_es} de {player_name} ({team_abbr}) tiene ventaja hoy: "
         f"{catalyst_reason}"
     )
 

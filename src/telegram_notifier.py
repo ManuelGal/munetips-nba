@@ -14,7 +14,8 @@ from src.llm_news_filter import verificar_nota_tactica_min_tokens
 def formatear_mensaje_munetips(op: PropEvaluationResult) -> str:
     """
     Formato limpio y directo de 7 renglones para el canal 'Muñetips'.
-    Traduce OVER/UNDER a 'MÁS DE' / 'MENOS DE' igual que en los botones de Playdoit.
+    Traduce OVER/UNDER a 'MÁS DE' / 'MENOS DE' igual que en los botones de Playdoit,
+    e indica la línea objetivo y el momio mínimo aceptable a verificar en Playdoit.
     """
     if op.market_type == "player_points":
         mercado_es = "Puntos"
@@ -27,7 +28,7 @@ def formatear_mensaje_munetips(op: PropEvaluationResult) -> str:
         pestana_playdoit = "Asistencias de Jugador Más de/Menos de"
 
     lado_es = "MENOS DE" if op.side == "UNDER" else "MÁS DE"
-    momio_am = decimal_a_americano(op.playdoit_odds)
+    momio_ref_am = decimal_a_americano(op.playdoit_odds)
     min_am = decimal_a_americano(op.min_acceptable_odds)
 
     nota_tactica = verificar_nota_tactica_min_tokens(
@@ -44,7 +45,7 @@ def formatear_mensaje_munetips(op: PropEvaluationResult) -> str:
         f"🏀 *{op.team_abbr} vs {op.opponent_abbr}*\n"
         f"👤 *{op.player_name}* — *{lado_es} {op.playdoit_line} {mercado_es}*\n"
         f"📂 _{pestana_playdoit}_\n\n"
-        f"💰 *Momio:* `{momio_am}` (`{op.playdoit_odds:.2f}`)  |  *Mín:* `{min_am}` (`{op.min_acceptable_odds:.2f}`)\n"
+        f"🛑 *Momio Mínimo Playdoit:* `{min_am}` (`{op.min_acceptable_odds:.2f}`)  |  *Ref:* `{momio_ref_am}` (`{op.playdoit_odds:.2f}`)\n"
         f"💵 *Apostar:* `${op.suggested_stake_mxn:.0f} MXN`\n"
         f"⚡ _{nota_tactica}_"
     )

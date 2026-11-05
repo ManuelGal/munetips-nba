@@ -2,7 +2,11 @@ name: Munetips NBA Cloud Scanner (24/7 Sin PC)
 
 on:
   schedule:
-    - cron: '12,42 * * * *'
+    # Ventana Mañana (Apertura de Líneas NBA): 9:15 AM y 11:15 AM CDMX (15:15 y 17:15 UTC)
+    - cron: '15 15,17 * * *'
+    # Ventanas Tarde/Noche (Reportes Oficiales de Lesiones Pre-Partido): 3:45 PM, 4:45 PM, 5:45 PM y 7:15 PM CDMX
+    - cron: '45 21,22,23 * * *'
+    - cron: '15 1 * * *'
 
   workflow_dispatch:
     inputs:
@@ -26,7 +30,7 @@ concurrency:
 jobs:
   escanear_nba_playdoit:
     runs-on: ubuntu-latest
-    timeout-minutes: 350
+    timeout-minutes: 10
 
     steps:
       - name: Descargar codigo del repositorio
@@ -37,7 +41,7 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Ejecutar Agente Cuantitativo Munetips (Ciclo Continuo cada 30 min)
+      - name: Ejecutar Agente Cuantitativo Munetips (Ejecucion Unica Limpia)
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -57,26 +61,9 @@ jobs:
             exit 0
           fi
 
-          # Ciclo automatico cada 30 minutos durante la jornada NBA (hasta 10 cortes = 5 horas por bloque)
-          for i in 1 2 3 4 5 6 7 8 9 10; do
-            HORA_UTC=$(date -u +%H)
-            echo "=== Corte #$i (Hora UTC: $HORA_UTC) ==="
-
-            # Horario activo NBA: 14:00 UTC a 03:59 UTC (8:00 AM a 9:59 PM CDMX)
-            if [ "$HORA_UTC" -ge 14 ] || [ "$HORA_UTC" -le 3 ]; then
-              git pull --rebase origin main || true
-              python main.py --scan
-              mkdir -p data
-              git add data/ || true
-              git diff --staged --quiet || git commit -m "chore(data): actualizar bitacora CLV"
-              git push origin main || true
-            else
-              echo "Fuera de horario NBA (Madrugada CDMX). Cerrando bloque."
-              break
-            fi
-
-            if [ "$i" -lt 10 ]; then
-              echo "Esperando 30 minutos exactos para el siguiente escaneo..."
-              sleep 1800
-            fi
-          done
+          git pull --rebase origin main || true
+          python main.py --scan
+          mkdir -p data
+          git add data/ || true
+          git diff --staged --quiet || git commit -m "chore(data): actualizar bitacora CLV y cache NBA"
+          git push origin main || true

@@ -1,21 +1,34 @@
 """
-Motor Matemático Cuantitativo para NBA Player Props (Rebotes y Asistencias).
+Motor Matemático Cuantitativo para NBA Player Props (Puntos, Rebotes y Asistencias).
 Implementa:
-1. Proyección sin doble conteo: parte de la media implícita limpia del mercado Sharp (FanDuel/Pinnacle)
-   y SOLO suma minutos extra si la baja acaba de ocurrir en esta ventana (Recién Descartado).
-2. Asimetría contractual de Playdoit.mx (Sin Prop Protect):
-   - Penaliza la probabilidad real de todos los OVERS en -1.8% por riesgo de lesión en 1ra mitad / faltas.
-   - Bonifica la probabilidad real de todos los UNDERS en +1.8% + descuento bimodal por Blowout (Spread).
-3. Distribución Binomial Negativa (Poisson sobredispersa) en Python puro.
+1. Modelo Estadístico Independiente basado en tasas reales de temporada (ESPN Overview API),
+   separado de la media implícita Sharp (evita el doble conteo de spread/lesiones).
+2. Sinergia Posicional Múltiple: distribuye minutos y uso según posición (Guard / Wing / Big)
+   y tipo de mercado cuando hay 1 o más compañeros titulares/rotación fuera (OUT/DOUBTFUL).
+3. Devigging por Método de Potencia (Power Method) para eliminar el vig de las casas Sharp
+   penalizando correctamente el sesgo de cuotas largas (longshot bias).
+4. Distribución Binomial Negativa Compuesta (recursión exacta de Panjer con saltos de 1, 2 y 3 pts)
+   para Puntos de Jugador, y Binomial Negativa para conteos unitarios (Rebotes y Asistencias).
+5. Regla Contractual Exacta de Playdoit.mx en Pre-Partido:
+   - Lesión en 1ra Mitad (~1.0%): el OVER se ANULA/REEMBOLSA (Void = 0), el UNDER GANA (+1).
+   - Lesión en 2da Mitad / Faltas (~0.8%): el OVER PIERDE (-1), el UNDER GANA (+1).
 """
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Any, Optional
 import config
 
-# Probabilidad histórica NBA de que un jugador salga antes de tiempo por lesión/faltas/expulsión (~1.8%)
-PLAYDOIT_EARLY_EXIT_PROB = 0.018
+
+@dataclass
+class TeammateOutInfo:
+    player_name: str
+    position: str
+    avg_minutes: float
+    pts_per_min: float = 0.45
+    reb_per_min: float = 0.18
+    ast_per_min: float = 0.12
+    is_newly_out: bool = False
 
 
 @dataclass
@@ -23,16 +36,18 @@ class PlayerProjectionInput:
     player_name: str
     team_abbr: str
     opponent_abbr: str
-    market_type: str               # "player_rebounds" | "player_assists"
+    market_type: str               # "player_points" | "player_rebounds" | "player_assists"
     is_starter: bool
     base_minutes: float
     rate_per_minute: float
     team_pace: float
     opp_pace: float
     game_spread: float
+    position: str = "G"
+    teammates_out: list[Any] = field(default_factory=list)
     teammate_out_name: Optional[str] = None
     teammate_out_minutes: float = 0.0
-    is_breaking_injury: bool = False  # True SOLO si acaba de cambiar a OUT en los últimos 30 min
+    is_breaking_injury: bool = False
     usage_boost_factor: float = 1.0
     minutes_cap_news: Optional[float] = None
     is_two_way_contract: bool = False
@@ -60,33 +75,152 @@ class PropEvaluationResult:
     catalyst_reason: str
 
 
+def _grupo_posicional(pos: str) -> str:
+    p = (pos or "G").upper().strip()
+    if p in ("PG", "SG", "G"):
+        return "GUARD"
+    if p in ("C", "PF", "F-C", "C-F"):
+        return "BIG"
+    return "WING"
+
+
+def _calcular_sinergia_posicional(
+    pos_jugador: str,
+    es_titular: bool,
+    market_type: str,
+    baja_pos: str,
+    baja_min: float,
+    baja_reb_pm: float,
+    baja_ast_pm: float,
+) -> tuple[float, float]:
+    """
+    Calcula cuántos minutos extra y qué porcentaje de impulso de tasa por minuto (usage/rate boost)
+    recibe un jugador activo cuando sale un compañero de rotación, según su sinergia posicional.
+    """
+    g_jug = _grupo_posicional(pos_jugador)
+    g_baja = _grupo_posicional(baja_pos)
+
+    if g_jug == g_baja:
+        afinidad_min = 1.0
+    elif "WING" in (g_jug, g_baja):
+        afinidad_min = 0.60
+    else:
+        afinidad_min = 0.25
+
+    if not es_titular:
+        extra_min = min(6.5, baja_min * 0.20 * afinidad_min)
+    else:
+        extra_min = min(2.8, baja_min * 0.08 * afinidad_min)
+
+    boost_tasa = 0.0
+    if market_type == "player_assists":
+        es_creador = (g_baja == "GUARD") or (baja_ast_pm >= 0.16)
+        if es_creador:
+            if g_jug == "GUARD":
+                boost_tasa = 0.11
+            elif g_jug == "WING":
+                boost_tasa = 0.06
+            else:
+                boost_tasa = 0.03
+        else:
+            boost_tasa = 0.02
+    elif market_type == "player_rebounds":
+        es_reboteador = (g_baja == "BIG") or (baja_reb_pm >= 0.22)
+        if es_reboteador:
+            if g_jug == "BIG":
+                boost_tasa = 0.11
+            elif g_jug == "WING":
+                boost_tasa = 0.06
+            else:
+                boost_tasa = 0.025
+        else:
+            boost_tasa = 0.02
+    else:  # player_points
+        if g_jug == g_baja:
+            boost_tasa = 0.075
+        elif "WING" in (g_jug, g_baja):
+            boost_tasa = 0.055
+        else:
+            boost_tasa = 0.040
+
+    return extra_min, boost_tasa
+
+
 def proyectar_minutos_y_media(inp: PlayerProjectionInput) -> tuple[float, float, list[str]]:
     """
-    Calcula E[Minutos] y E[Estadística] (λ).
-    IMPORTANTE: Si la baja de un compañero ya era conocida desde ayer (is_breaking_injury=False),
-    NO vuelve a sumar minutos encima de la línea de FanDuel (evita el doble conteo que inflaba los OVERS).
+    Modelo estadístico independiente de E[Minutos] y E[Estadística] (λ).
+    Usa los promedios reales de temporada del jugador, aplica sinergia posicional para
+    todas las bajas del equipo, ritmo (Pace) y descuento por riesgo de Blowout (Spread).
     """
-    notas = []
+    notas: list[str] = []
     minutos = inp.base_minutes
     factor_uso = 1.0
 
-    # 1. SOLO sumar shock de minutos si la baja acaba de ocurrir en esta ventana (Recién Descartado)
-    if inp.is_breaking_injury and inp.teammate_out_name and inp.teammate_out_minutes >= 22.0:
-        if not inp.is_starter:
-            extra_min = min(7.5, inp.teammate_out_minutes * 0.22)
-            minutos += extra_min
-            notas.append(
-                f"Baja de última hora de {inp.teammate_out_name} libera +{extra_min:.1f} min aún no ajustados"
+    # Normalizar lista de bajas (soporta lista completa de perfiles o campos simples de demo)
+    lista_bajas = list(inp.teammates_out) if inp.teammates_out else []
+    if not lista_bajas and inp.teammate_out_name and inp.teammate_out_minutes >= 20.0:
+        lista_bajas.append(
+            TeammateOutInfo(
+                player_name=inp.teammate_out_name,
+                position=inp.position,
+                avg_minutes=inp.teammate_out_minutes,
+                is_newly_out=inp.is_breaking_injury,
             )
+        )
+
+    total_extra_min = 0.0
+    total_boost_tasa = 0.0
+    nombres_bajas_recientes: list[str] = []
+    nombres_bajas_previas: list[str] = []
+
+    for b in lista_bajas:
+        b_min = float(getattr(b, "avg_minutes", 0.0) or 0.0)
+        if b_min < 20.0:
+            continue
+        b_name = getattr(b, "player_name", "Titular")
+        b_pos = getattr(b, "position", inp.position)
+        b_reb = float(getattr(b, "reb_per_min", 0.18) or 0.18)
+        b_ast = float(getattr(b, "ast_per_min", 0.12) or 0.12)
+        b_new = bool(getattr(b, "is_newly_out", False) or inp.is_breaking_injury)
+
+        ex_m, ex_boost = _calcular_sinergia_posicional(
+            pos_jugador=inp.position,
+            es_titular=inp.is_starter,
+            market_type=inp.market_type,
+            baja_pos=b_pos,
+            baja_min=b_min,
+            baja_reb_pm=b_reb,
+            baja_ast_pm=b_ast,
+        )
+        total_extra_min += ex_m
+        total_boost_tasa += ex_boost
+        if b_new:
+            nombres_bajas_recientes.append(b_name)
         else:
-            extra_min = min(2.5, inp.teammate_out_minutes * 0.07)
-            minutos += extra_min
+            nombres_bajas_previas.append(b_name)
+
+    tope_extra_min = 8.5 if not inp.is_starter else 4.5
+    total_extra_min = min(tope_extra_min, total_extra_min)
+    total_boost_tasa = min(0.22, total_boost_tasa)
+
+    if total_extra_min > 0.2 or total_boost_tasa > 0.01:
+        minutos += total_extra_min
+        factor_uso += total_boost_tasa
+        if inp.usage_boost_factor > factor_uso and not inp.teammates_out:
             factor_uso = inp.usage_boost_factor
+
+        if nombres_bajas_recientes:
+            bajas_str = ", ".join(nombres_bajas_recientes[:2])
             notas.append(
-                f"Baja recién confirmada de {inp.teammate_out_name} sube uso (+{(factor_uso - 1)*100:.0f}%)"
+                f"Baja de última hora ({bajas_str}) libera +{total_extra_min:.1f} min y +{(factor_uso - 1)*100:.0f}% uso"
+            )
+        elif nombres_bajas_previas:
+            bajas_str = ", ".join(nombres_bajas_previas[:2])
+            notas.append(
+                f"Rotación sin {bajas_str} (+{total_extra_min:.1f} min proyectados)"
             )
 
-    # 2. Descuento bimodal por riesgo de paliza (Blowout según Spread) -> Favorece UNDERS de titulares
+    # 2. Descuento bimodal por riesgo de paliza (Blowout según Spread) en el modelo estadístico
     abs_spread = abs(inp.game_spread)
     if abs_spread >= config.BLOWOUT_SPREAD_THRESHOLD:
         exceso_spread = abs_spread - config.BLOWOUT_SPREAD_THRESHOLD + 1.5
@@ -101,8 +235,12 @@ def proyectar_minutos_y_media(inp: PlayerProjectionInput) -> tuple[float, float,
             notas.append(f"Restricción médica: tope de {inp.minutes_cap_news:.0f} min")
             minutos = inp.minutes_cap_news
 
-    minutos = max(8.0, min(40.0, minutos))
-    media_lambda = minutos * inp.rate_per_minute * factor_uso
+    # 4. Ajuste por ritmo de juego (Pace)
+    ritmo_esperado = (inp.team_pace + inp.opp_pace) / 2.0
+    factor_ritmo = ritmo_esperado / max(85.0, config.LEAGUE_AVG_PACE)
+
+    minutos = max(8.0, min(38.5, minutos))
+    media_lambda = minutos * inp.rate_per_minute * factor_uso * factor_ritmo
 
     return round(minutos, 2), round(media_lambda, 3), notas
 
@@ -125,23 +263,67 @@ def _nbinom_pmf(k: int, mu: float, alpha: float) -> float:
     return math.exp(log_prob)
 
 
+def _compound_points_pmf(max_k: int, mu_points: float, alpha_events: float) -> list[float]:
+    """
+    Distribución Binomial Negativa Compuesta para Puntos de Jugador (recursión exacta de Panjer).
+    En la NBA, un jugador no anota de 1 en 1 como en rebotes: cada posesión anotadora suma
+    1 punto (tiro libre, p1=0.22), 2 puntos (doble, p2=0.52) o 3 puntos (triple, p3=0.26),
+    con salto medio E[Y] = 2.04 puntos por evento anotador.
+    Esto captura exactamente la mayor varianza de Puntos (Fano ~ 2.27 + alpha * mu).
+    """
+    if mu_points <= 0:
+        res = [0.0] * (max_k + 1)
+        res[0] = 1.0
+        return res
+
+    f1, f2, f3 = 0.22, 0.52, 0.26
+    mean_jump = (1.0 * f1) + (2.0 * f2) + (3.0 * f3)  # 2.04 puntos por evento anotador
+    mu_events = mu_points / mean_jump
+
+    r = 1.0 / max(1e-4, alpha_events)
+    p = r / (r + mu_events)
+    q = 1.0 - p
+
+    # Panjer recursion for Compound Negative Binomial:
+    # g_0 = p^r
+    # g_k = (1 / k) * q * sum_{j=1}^{min(k,3)} (r * j + k - j) * f_j * g_{k - j}
+    g = [0.0] * (max_k + 1)
+    g[0] = math.exp(r * math.log(p))
+    jumps = ((1, f1), (2, f2), (3, f3))
+
+    for k in range(1, max_k + 1):
+        acc = 0.0
+        for j, fj in jumps:
+            if k >= j:
+                acc += (r * j + (k - j)) * fj * g[k - j]
+        g[k] = (q / k) * acc
+
+    return g
+
+
 def calcular_probabilidad_linea(
     media_lambda: float,
     linea: float,
     market_type: str,
 ) -> tuple[float, float]:
-    if market_type == "player_points":
-        alpha = getattr(config, "OVERDISPERSION_ALPHA_PTS", 0.09)
-    elif market_type == "player_rebounds":
-        alpha = config.OVERDISPERSION_ALPHA_REB
-    else:
-        alpha = config.OVERDISPERSION_ALPHA_AST
-
     es_linea_entera = abs(linea - round(linea)) < 1e-4
     limite_under = int(round(linea)) - 1 if es_linea_entera else int(math.floor(linea))
+    max_k = max(limite_under + 2, int(round(linea)) + 1)
 
-    prob_under = sum(_nbinom_pmf(k, media_lambda, alpha) for k in range(0, limite_under + 1))
-    prob_push = _nbinom_pmf(int(round(linea)), media_lambda, alpha) if es_linea_entera else 0.0
+    if market_type == "player_points":
+        alpha_pts = getattr(config, "OVERDISPERSION_ALPHA_PTS", 0.09)
+        pmf_vec = _compound_points_pmf(max_k, media_lambda, alpha_pts)
+        prob_under = sum(pmf_vec[k] for k in range(0, limite_under + 1))
+        prob_push = pmf_vec[int(round(linea))] if es_linea_entera else 0.0
+    else:
+        alpha = (
+            config.OVERDISPERSION_ALPHA_REB
+            if market_type == "player_rebounds"
+            else config.OVERDISPERSION_ALPHA_AST
+        )
+        prob_under = sum(_nbinom_pmf(k, media_lambda, alpha) for k in range(0, limite_under + 1))
+        prob_push = _nbinom_pmf(int(round(linea)), media_lambda, alpha) if es_linea_entera else 0.0
+
     prob_over = max(0.0, 1.0 - prob_under - prob_push)
 
     denom = prob_over + prob_under
@@ -153,12 +335,30 @@ def calcular_probabilidad_linea(
 
 
 def quitar_margen_casa(cuota_over: float, cuota_under: float) -> tuple[float, float]:
-    imp_over = 1.0 / cuota_over
-    imp_under = 1.0 / cuota_under
-    total = imp_over + imp_under
-    if total <= 0:
+    """
+    Elimina el margen (overround/vig) usando el Método de Potencia (Power Method):
+    encuentra el exponente k > 0 tal que (1/O_over)^k + (1/O_under)^k = 1.
+    Corrige el sesgo de cuotas largas (longshot bias) de las casas de apuestas.
+    """
+    if cuota_over <= 1.01 or cuota_under <= 1.01:
         return 0.5, 0.5
-    return imp_over / total, imp_under / total
+    q_over = 1.0 / cuota_over
+    q_under = 1.0 / cuota_under
+    if q_over + q_under <= 0:
+        return 0.5, 0.5
+
+    low_k, high_k = 0.5, 4.0
+    for _ in range(25):
+        mid_k = (low_k + high_k) / 2.0
+        s = (q_over ** mid_k) + (q_under ** mid_k)
+        if s > 1.0:
+            low_k = mid_k
+        else:
+            high_k = mid_k
+    k_opt = (low_k + high_k) / 2.0
+    p_over = q_over ** k_opt
+    p_under = 1.0 - p_over
+    return p_over, p_under
 
 
 def calcular_lambda_implicita_sharp(
@@ -166,8 +366,8 @@ def calcular_lambda_implicita_sharp(
     sharp_line: float,
     market_type: str,
 ) -> float:
-    low, high = 0.3, 48.0
-    for _ in range(20):
+    low, high = 0.3, 52.0
+    for _ in range(22):
         mid = (low + high) / 2.0
         p_ov, _ = calcular_probabilidad_linea(mid, sharp_line, market_type)
         if p_ov < sharp_prob_over_en_su_linea:
@@ -192,14 +392,49 @@ def ajustar_prob_sharp_por_diferencia_de_linea(
     return calcular_probabilidad_linea(sharp_implied_lambda, playdoit_line, market_type)
 
 
-def aplicar_asimetria_lesion_playdoit(prob_over: float, prob_under: float) -> tuple[float, float]:
+def aplicar_asimetria_lesion_playdoit(
+    prob_over_sano: float,
+    prob_under_sano: float,
+) -> tuple[float, float, float]:
     """
-    En Playdoit NO existe 'Prop Protect': si el jugador se lesiona o se llena de faltas en el 1er tiempo,
-    el OVER pierde automáticamente y el UNDER gana automáticamente (~1.8% de los partidos).
+    Modela la regla contractual real de Playdoit.mx (Altenar) en pre-partido:
+    - Si el jugador sale lesionado en la 1ra mitad y no regresa (~1.0% = p_void_1h):
+      * El OVER se ANULA / REEMBOLSA (Void, retorno neto = 0).
+      * El UNDER GANA (+1).
+    - Si el jugador sale lesionado en la 2da mitad o por faltas (~0.8% = p_loss_2h):
+      * El OVER PIERDE (-1).
+      * El UNDER GANA (+1).
+    Devuelve: (prob_win_over, prob_win_under, prob_void_over)
     """
-    real_over = prob_over * (1.0 - PLAYDOIT_EARLY_EXIT_PROB)
-    real_under = prob_under + (prob_over * PLAYDOIT_EARLY_EXIT_PROB)
-    return min(0.99, max(0.01, real_over)), min(0.99, max(0.01, real_under))
+    p_void_1h = getattr(config, "PLAYDOIT_FIRST_HALF_VOID_PROB", 0.010)
+    p_loss_2h = getattr(config, "PLAYDOIT_SECOND_HALF_LOSS_PROB", 0.008)
+
+    prob_win_over = prob_over_sano * (1.0 - p_void_1h - p_loss_2h)
+    prob_void_over = prob_over_sano * p_void_1h
+    prob_win_under = prob_under_sano + (prob_over_sano * (p_void_1h + p_loss_2h))
+
+    return (
+        min(0.99, max(0.01, prob_win_over)),
+        min(0.99, max(0.01, prob_win_under)),
+        min(0.05, max(0.0, prob_void_over)),
+    )
+
+
+def calcular_ev_real_playdoit(
+    side: str,
+    prob_win: float,
+    prob_void: float,
+    cuota_decimal: float,
+) -> float:
+    """
+    Calcula el Valor Esperado (EV) exacto considerando la probabilidad de reembolso (Void) en 1ra mitad para OVERS:
+    EV = P(Win) * (Cuota - 1) - P(Loss) * 1 + P(Void) * 0
+    """
+    if side == "OVER":
+        prob_loss = max(0.0, 1.0 - prob_win - prob_void)
+        return (prob_win * (cuota_decimal - 1.0)) - prob_loss
+    prob_loss_under = max(0.0, 1.0 - prob_win)
+    return (prob_win * (cuota_decimal - 1.0)) - prob_loss_under
 
 
 def calcular_score_1_a_10(
@@ -212,11 +447,8 @@ def calcular_score_1_a_10(
     is_starter: bool,
 ) -> float:
     """
-    Escala calibrada 1 a 10 para el canal Muñetips:
-    Toda jugada que ya superó el umbral estricto de EV (+4.2% en UNDER o +6.0% en OVER)
-    arranca en base 5.5 y suma puntos por magnitud de EV, diferencia de línea y reglas de Playdoit.
+    Escala calibrada 1 a 10 para el canal Muñetips.
     """
-    # Base para apuestas con EV neto positivo comprobado sobre la línea sin vig de FanDuel
     if ev_pct < 0.015:
         pts_ev = 4.5 + (ev_pct / 0.015) * 1.0
     elif ev_pct < 0.035:
@@ -252,11 +484,20 @@ def calcular_score_1_a_10(
     return round(min(9.9, max(1.0, raw_score)), 1)
 
 
-def calcular_stake_playdoit(prob_ganar: float, cuota_decimal: float) -> float:
+def calcular_stake_playdoit(
+    prob_win: float,
+    prob_void: float,
+    cuota_decimal: float,
+) -> float:
     b = cuota_decimal - 1.0
     if b <= 0:
         return 0.0
-    kelly_puro = (prob_ganar * b - (1.0 - prob_ganar)) / b
+    prob_loss = max(0.0, 1.0 - prob_win - prob_void)
+    denom_resuelta = max(0.01, 1.0 - prob_void)
+    p_cond = prob_win / denom_resuelta
+    q_cond = prob_loss / denom_resuelta
+
+    kelly_puro = (p_cond * b - q_cond) / b
     if kelly_puro <= 0:
         return 0.0
 
@@ -278,45 +519,72 @@ def evaluar_oportunidad_prop(
     if inp.is_two_way_contract or playdoit_over_odds is None or playdoit_under_odds is None:
         return None
 
+    # 1. Proyección estadística independiente (basada en tasas reales de temporada + sinergia posicional + spread)
     proj_min, proj_lambda, notas = proyectar_minutos_y_media(inp)
     raw_model_over, raw_model_under = calcular_probabilidad_linea(
         proj_lambda, playdoit_line, inp.market_type
     )
 
+    # 2. Probabilidad justa del consenso Sharp sin vig (Power Method) ajustada a la línea objetivo
     sharp_base_over, _ = quitar_margen_casa(sharp_over_odds, sharp_under_odds)
     raw_sharp_over, raw_sharp_under = ajustar_prob_sharp_por_diferencia_de_linea(
         sharp_base_over, sharp_line, playdoit_line, inp.market_type
     )
 
-    # Aplicar la asimetría real de reglas de Playdoit (+1.8% al UNDER, -1.8% al OVER por lesión en vivo)
-    model_p_over, model_p_under = aplicar_asimetria_lesion_playdoit(raw_model_over, raw_model_under)
-    sharp_adj_over, sharp_adj_under = aplicar_asimetria_lesion_playdoit(raw_sharp_over, raw_sharp_under)
+    # 3. Aplicar la regla contractual exacta de Playdoit (1ra mitad Void en OVER, ganancia en UNDER)
+    model_win_over, model_win_under, model_void_over = aplicar_asimetria_lesion_playdoit(
+        raw_model_over, raw_model_under
+    )
+    sharp_win_over, sharp_win_under, sharp_void_over = aplicar_asimetria_lesion_playdoit(
+        raw_sharp_over, raw_sharp_under
+    )
 
-    peso_modelo = 0.55 if (inp.is_breaking_injury or inp.minutes_cap_news) else 0.45
-    blended_over = (peso_modelo * model_p_over) + ((1.0 - peso_modelo) * sharp_adj_over)
-    blended_under = (peso_modelo * model_p_under) + ((1.0 - peso_modelo) * sharp_adj_under)
+    tiene_baja_reciente = bool(
+        inp.is_breaking_injury
+        or any(getattr(b, "is_newly_out", False) for b in (inp.teammates_out or []))
+    )
+    peso_modelo = 0.55 if (tiene_baja_reciente or inp.minutes_cap_news) else 0.45
 
-    candidatos = [
-        ("UNDER", playdoit_under_odds, model_p_under, sharp_adj_under, blended_under, config.MIN_EV_UNDER),
-        ("OVER", playdoit_over_odds, model_p_over, sharp_adj_over, blended_over, config.MIN_EV_OVER),
-    ]
+    blended_win_over = (peso_modelo * model_win_over) + ((1.0 - peso_modelo) * sharp_win_over)
+    blended_void_over = (peso_modelo * model_void_over) + ((1.0 - peso_modelo) * sharp_void_over)
+    blended_win_under = (peso_modelo * model_win_under) + ((1.0 - peso_modelo) * sharp_win_under)
 
     # Regla de Horario (Mañana vs. Tarde):
-    # - En la Mañana (8:00 AM a 11:59 AM CDMX = 14:00 a 17:59 UTC): se cazan errores de apertura.
-    # - En la Tarde (después de las 12:00 PM CDMX): el mercado ya ajustó las aperturas; SOLO vale la pena
-    #   disparar si hay una baja recién confirmada (is_breaking_injury) o si Playdoit tiene la línea
-    #   atrasada por al menos medio punto (>= 0.5 pts) frente a FanDuel.
+    # - En la Mañana (7:00 AM a 11:59 AM CDMX = 13:00 a 17:59 UTC): se cazan aperturas con valor.
+    # - En la Tarde (después de las 12:00 PM CDMX): el mercado ya ajustó las aperturas; SOLO se dispara
+    #   si hay una baja recién confirmada (tiene_baja_reciente), tope de minutos nuevo, o línea atrasada >= 0.5 pts.
     hora_utc = datetime.now(timezone.utc).hour
     es_ventana_manana = 13 <= hora_utc <= 17
     hay_desfase_de_linea = abs(sharp_line - playdoit_line) >= 0.5
-    hay_catalizador_nuevo = bool(inp.is_breaking_injury or inp.minutes_cap_news)
+    hay_catalizador_nuevo = bool(tiene_baja_reciente or inp.minutes_cap_news)
 
     if not es_ventana_manana and not (hay_desfase_de_linea or hay_catalizador_nuevo):
         return None
 
+    candidatos = [
+        (
+            "UNDER",
+            playdoit_under_odds,
+            model_win_under,
+            sharp_win_under,
+            blended_win_under,
+            0.0,
+            config.MIN_EV_UNDER,
+        ),
+        (
+            "OVER",
+            playdoit_over_odds,
+            model_win_over,
+            sharp_win_over,
+            blended_win_over,
+            blended_void_over,
+            config.MIN_EV_OVER,
+        ),
+    ]
+
     mejor_resultado: Optional[PropEvaluationResult] = None
 
-    for side, odds, m_prob, s_prob, b_prob, min_ev_req in candidatos:
+    for side, odds, m_prob, s_prob, b_win_prob, b_void_prob, min_ev_req in candidatos:
         if odds < config.MIN_PLAYDOIT_ODDS_DECIMAL or odds > config.MAX_PLAYDOIT_ODDS_DECIMAL:
             continue
 
@@ -325,11 +593,16 @@ def evaluar_oportunidad_prop(
         if side == "UNDER" and playdoit_line < sharp_line:
             continue
 
-        ev = (b_prob * odds) - 1.0
+        ev = calcular_ev_real_playdoit(side, b_win_prob, b_void_prob, odds)
         if ev < min_ev_req:
             continue
 
-        has_catalyst = bool(inp.is_breaking_injury or inp.minutes_cap_news)
+        has_catalyst = bool(
+            tiene_baja_reciente
+            or inp.minutes_cap_news
+            or (inp.teammates_out and len(inp.teammates_out) > 0)
+            or inp.teammate_out_name
+        )
         score = calcular_score_1_a_10(
             ev_pct=ev,
             side=side,
@@ -340,16 +613,27 @@ def evaluar_oportunidad_prop(
             is_starter=inp.is_starter,
         )
 
-        min_odds = max(config.MIN_PLAYDOIT_ODDS_DECIMAL, round(1.035 / b_prob, 2))
-        stake = calcular_stake_playdoit(b_prob, odds)
+        # Cuota mínima aceptable en Playdoit para mantener al menos +3.5% de EV real (y >= 1.77 / -130)
+        prob_loss = max(0.0, 1.0 - b_win_prob - b_void_prob)
+        cuota_min_ev = 1.0 + ((prob_loss + 0.035) / max(0.05, b_win_prob))
+        min_odds = max(config.MIN_PLAYDOIT_ODDS_DECIMAL, round(cuota_min_ev, 2))
+
+        stake = calcular_stake_playdoit(b_win_prob, b_void_prob, odds)
+        prob_efectiva_mostrar = b_win_prob / max(0.01, 1.0 - b_void_prob)
 
         notas_alerta = list(notas)
         if abs(sharp_line - playdoit_line) >= 0.5:
-            notas_alerta.insert(0, f"Línea atrasada en Playdoit ({playdoit_line}) vs FanDuel ({sharp_line})")
+            notas_alerta.insert(0, f"Línea objetivo {playdoit_line} con ventaja vs consenso Sharp ({sharp_line})")
         elif side == "UNDER":
-            notas_alerta.insert(0, f"Valor en UNDER ({odds:.2f}) + bono de +1.8% por regla de lesión Playdoit")
+            notas_alerta.insert(
+                0,
+                f"Proyección {proj_lambda:.1f} por debajo de {playdoit_line} + ventaja por regla de lesión Playdoit",
+            )
         else:
-            notas_alerta.insert(0, f"Cuota desfasada en Playdoit ({odds:.2f}) vs consenso Sharp")
+            notas_alerta.insert(
+                0,
+                f"Proyección {proj_lambda:.1f} supera línea {playdoit_line} (reembolso si sale en 1ra mitad)",
+            )
 
         res = PropEvaluationResult(
             player_name=inp.player_name,
@@ -364,7 +648,7 @@ def evaluar_oportunidad_prop(
             projected_minutes=proj_min,
             projected_mean_lambda=proj_lambda,
             model_prob=round(m_prob, 4),
-            blended_prob=round(b_prob, 4),
+            blended_prob=round(prob_efectiva_mostrar, 4),
             ev_pct=round(ev, 4),
             score_1_to_10=score,
             suggested_stake_mxn=stake,
