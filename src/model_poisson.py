@@ -129,11 +129,12 @@ def calcular_probabilidad_linea(
     linea: float,
     market_type: str,
 ) -> tuple[float, float]:
-    alpha = (
-        config.OVERDISPERSION_ALPHA_REB
-        if market_type == "player_rebounds"
-        else config.OVERDISPERSION_ALPHA_AST
-    )
+    if market_type == "player_points":
+        alpha = getattr(config, "OVERDISPERSION_ALPHA_PTS", 0.09)
+    elif market_type == "player_rebounds":
+        alpha = config.OVERDISPERSION_ALPHA_REB
+    else:
+        alpha = config.OVERDISPERSION_ALPHA_AST
 
     es_linea_entera = abs(linea - round(linea)) < 1e-4
     limite_under = int(round(linea)) - 1 if es_linea_entera else int(math.floor(linea))
@@ -164,8 +165,8 @@ def calcular_lambda_implicita_sharp(
     sharp_line: float,
     market_type: str,
 ) -> float:
-    low, high = 0.3, 25.0
-    for _ in range(18):
+    low, high = 0.3, 48.0
+    for _ in range(20):
         mid = (low + high) / 2.0
         p_ov, _ = calcular_probabilidad_linea(mid, sharp_line, market_type)
         if p_ov < sharp_prob_over_en_su_linea:
