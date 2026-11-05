@@ -209,38 +209,44 @@ def calcular_score_1_a_10(
     game_spread: float,
     is_starter: bool,
 ) -> float:
-    if ev_pct < 0.04:
-        pts_ev = max(1.0, (ev_pct / 0.04) * 2.2)
+    """
+    Escala calibrada 1 a 10 para el canal Muñetips:
+    Toda jugada que ya superó el umbral estricto de EV (+4.2% en UNDER o +6.0% en OVER)
+    arranca en base 5.5 y suma puntos por magnitud de EV, diferencia de línea y reglas de Playdoit.
+    """
+    # Base para apuestas con EV positivo comprobado
+    if ev_pct < 0.042:
+        pts_ev = 4.0 + (ev_pct / 0.042) * 1.5
     elif ev_pct < 0.065:
-        pts_ev = 2.8 + ((ev_pct - 0.04) / 0.025) * 0.9
+        pts_ev = 5.6 + ((ev_pct - 0.042) / 0.023) * 1.0
     elif ev_pct < 0.10:
-        pts_ev = 3.7 + ((ev_pct - 0.065) / 0.035) * 0.8
+        pts_ev = 6.6 + ((ev_pct - 0.065) / 0.035) * 1.1
     else:
-        pts_ev = min(4.8, 4.5 + (ev_pct - 0.10) * 3.0)
+        pts_ev = min(8.2, 7.7 + (ev_pct - 0.10) * 4.0)
 
     ventaja_puntos = (sharp_line - playdoit_line) if side == "OVER" else (playdoit_line - sharp_line)
     if ventaja_puntos >= 1.0:
-        pts_linea = 3.0
+        pts_linea = 1.5
     elif ventaja_puntos >= 0.5:
-        pts_linea = 2.3
+        pts_linea = 1.1
     elif abs(ventaja_puntos) < 0.1:
-        pts_linea = 1.0
+        pts_linea = 0.4
     else:
         pts_linea = 0.0
 
     pts_contexto = 0.0
     if has_injury_catalyst:
-        pts_contexto += 1.4
+        pts_contexto += 0.7
 
     if side == "UNDER":
-        pts_contexto += 0.9  # Prioridad estructural a UNDERS en Playdoit por regla de lesión/faltas
+        pts_contexto += 0.6  # Prioridad estructural a UNDERS en Playdoit por regla de lesión/faltas
         if is_starter and abs(game_spread) >= 9.5:
-            pts_contexto += 0.5
+            pts_contexto += 0.4
     else:
         if not is_starter and has_injury_catalyst:
-            pts_contexto += 0.5
+            pts_contexto += 0.4
 
-    raw_score = pts_ev + pts_linea + min(2.5, pts_contexto)
+    raw_score = pts_ev + pts_linea + pts_contexto
     return round(min(9.9, max(1.0, raw_score)), 1)
 
 
