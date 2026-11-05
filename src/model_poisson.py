@@ -192,9 +192,13 @@ def proyectar_minutos_y_media(inp: PlayerProjectionInput) -> tuple[float, float,
             baja_reb_pm=b_reb,
             baja_ast_pm=b_ast,
         )
-        total_extra_min += ex_m
-        total_boost_tasa += ex_boost
+        # IMPORTANTE: Como `base_minutes` y `rate_per_minute` provienen de los promedios reales de
+        # la temporada actual (ESPN Overview API), las bajas antiguas (`b_new == False`) YA están
+        # absorbidas en los minutos promedio del jugador. Solo aplicamos el 100% del shock posicional
+        # cuando la baja es RECIENTE (`b_new == True`), evitando inflar artificialmente los OVERS.
         if b_new:
+            total_extra_min += ex_m
+            total_boost_tasa += ex_boost
             nombres_bajas_recientes.append(b_name)
         else:
             nombres_bajas_previas.append(b_name)

@@ -11,7 +11,7 @@ import re
 import urllib.request
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Any, Optional
 import config
 
 
@@ -61,6 +61,18 @@ def _http_get_json(url: str, timeout: int = 12) -> dict:
     req = urllib.request.Request(url, headers=HEADERS)
     with urllib.request.urlopen(req, timeout=timeout) as resp:
         return json.loads(resp.read().decode("utf-8"))
+
+
+def _safe_float(val: Any, default: float = 0.0) -> float:
+    if val is None:
+        return default
+    try:
+        limpio = str(val).replace(",", "").strip()
+        if not limpio or limpio == "--":
+            return default
+        return float(limpio)
+    except Exception:
+        return default
 
 
 def normalizar_nombre(nombre: str) -> str:
@@ -120,7 +132,7 @@ def _extraer_tope_minutos_de_texto(texto: str) -> Optional[float]:
         return None
     m = re.search(r"(\d{2})\s*(?:-|\s*to\s*)?\s*(\d{2})?\s*minutes", t_low)
     if m:
-        val = float(m.group(2) or m.group(1))
+        val = _safe_float(m.group(2) or m.group(1), 0.0)
         if 14.0 <= val <= 32.0:
             return val
     return None
@@ -142,10 +154,10 @@ def obtener_estadisticas_reales_jugador(
     cached = cache_stats.get(player_id)
     if cached and cached.get("date") == hoy_str and cached.get("has_real_stats"):
         return (
-            float(cached["avg_minutes"]),
-            float(cached["pts_per_min"]),
-            float(cached["reb_per_min"]),
-            float(cached["ast_per_min"]),
+            _safe_float(cached.get("avg_minutes"), 28.0),
+            _safe_float(cached.get("pts_per_min"), 0.45),
+            _safe_float(cached.get("reb_per_min"), 0.18),
+            _safe_float(cached.get("ast_per_min"), 0.12),
             cached.get("minutes_cap"),
             True,
         )
@@ -169,6 +181,13 @@ def obtener_estadisticas_reales_jugador(
         names = stats_block.get("names", [])
         splits = stats_block.get("splits", [])
 
+        # Soportar estructura anidada `categories` si ESPN la devuelve así para ciertos perfiles
+        if (not names or not splits) and isinstance(stats_block.get("categories"), list):
+            cats = stats_block["categories"]
+            if cats:
+                names = cats[0].get("names", names)
+                splits = cats[0].get("splits", splits)
+
         elegida = None
         for sp in splits:
             if "regular" in (sp.get("displayName") or "").lower():
@@ -184,14 +203,14 @@ def obtener_estadisticas_reales_jugador(
             min_cap = _extraer_tope_minutos_de_texto(story)
 
         if names and elegida and len(names) == len(elegida):
-            mapa = dict(zip(names, elegida))
-            gp = float(mapa.get("GP", 0) or 0)
-            avg_min = float(mapa.get("MIN", 0) or 0)
-            avg_pts = float(mapa.get("PTS", 0) or 0)
-            avg_reb = float(mapa.get("REB", 0) or 0)
-            avg_ast = float(mapa.get("AST", 0) or 0)
+            mapa = {str(k).upper(): v for k, v in zip(names, elegida)}
+            gp = _safe_float(mapa.get("GP"), 0.0)
+            avg_min = _safe_float(mapa.get("MIN"), 0.0)
+            avg_pts = _safe_float(mapa.get("PTS"), 0.0)
+            avg_reb = _safe_float(mapa.get("REB"), 0.0)
+            avg_ast = _safe_float(mapa.get("AST"), 0.0)
 
-            if gp >= 2 and avg_min >= 8.0:
+            if gp >= 1 and avg_min >= 8.0:
                 pts_pm = round(avg_pts / avg_min, 4)
                 reb_pm = round(avg_reb / avg_min, 4)
                 ast_pm = round(avg_ast / avg_min, 4)
@@ -279,16 +298,16 @@ def obtener_roster_y_bajas_equipo(
                 status = "QUESTIONABLE"
 
         contract_info = str(ath.get("contract", "")).lower()
-        experience = ath.get("experience", {}).get("years", 1)
-        salary = ath.get("salary", 2000000)
+        experience = _safe_float(ath.get("experience", {}).get("years", 1), 1.0)
+        salary = _safe_float(ath.get("salary", 2000000), 2000000.0)
         is_two_way = ("two-way" in contract_info) or (experience == 0 and salary < 600000)
 
         es_titular = norm in starters_norm
         es_segunda_unidad = norm in second_unit_norm
         pos_abbr = (ath.get("position", {}).get("abbreviation") or "G").upper()
 
-        # Consultar estadísticas reales de temporada para titulares, segunda unidad o jugadores lesionados
-        if (es_titular or es_segunda_unidad or status in ("OUT", "DOUBTFUL", "QUESTIONABLE")) and not is_two_way:
+        # Consultar estadísticas reales de temporada para todos los jugadores que no sean two-way
+        if not is_two_way:
             avg_min, pts_rate, reb_rate, ast_rate, min_cap, has_real = obtener_estadisticas_reales_jugador(
                 player_id=pid,
                 pos_abbr=pos_abbr,
@@ -302,7 +321,6 @@ def obtener_roster_y_bajas_equipo(
             min_cap = None
             has_real = False
 
-        # También revisar si el comentario de lesión menciona límite de minutos
         if min_cap is None and detail:
             min_cap = _extraer_tope_minutos_de_texto(detail)
 
@@ -343,6 +361,9 @@ def obtener_contexto_partidos_hoy() -> list[NBAGameContext]:
     nuevo_estado_lesiones = dict(cache_previa)
     partidos_contexto: list[NBAGameContext] = []
 
+    total_activos_reales = 0
+    total_activos_fallback = 0
+
     for ev in sb.get("events", []):
         game_id = str(ev.get("id", ""))
         start_time = ev.get("date", datetime.now(timezone.utc).isoformat())
@@ -358,7 +379,7 @@ def obtener_contexto_partidos_hoy() -> list[NBAGameContext]:
             try:
                 partes = details.split()
                 if len(partes) == 2:
-                    home_spread = float(partes[1])
+                    home_spread = _safe_float(partes[1], 0.0)
             except Exception:
                 home_spread = 0.0
 
@@ -391,7 +412,6 @@ def obtener_contexto_partidos_hoy() -> list[NBAGameContext]:
                 prev_status = cache_previa.get(clave_norm, p.injury_status if primer_escaneo else "ACTIVE")
                 nuevo_estado_lesiones[clave_norm] = p.injury_status
 
-                # Conservar TODAS las bajas de titulares o rotación principal (>= 20 min reales)
                 if p.injury_status in ("OUT", "DOUBTFUL") and p.avg_minutes >= 20.0:
                     if not primer_escaneo and prev_status not in ("OUT", "DOUBTFUL"):
                         p.is_newly_out = True
@@ -399,6 +419,10 @@ def obtener_contexto_partidos_hoy() -> list[NBAGameContext]:
                     newly_out_starters.append(p)
                 elif p.injury_status in ("ACTIVE", "QUESTIONABLE"):
                     active_players[clave_norm] = p
+                    if p.has_real_stats:
+                        total_activos_reales += 1
+                    else:
+                        total_activos_fallback += 1
 
         partidos_contexto.append(
             NBAGameContext(
@@ -415,6 +439,10 @@ def obtener_contexto_partidos_hoy() -> list[NBAGameContext]:
             )
         )
 
+    print(
+        f"[NBA DATA] Estadísticas reales ESPN cargadas para jugadores activos: "
+        f"{total_activos_reales} reales / {total_activos_fallback} fallback"
+    )
     guardar_cache_lesiones(nuevo_estado_lesiones)
     _guardar_cache_stats(cache_stats)
     return partidos_contexto
