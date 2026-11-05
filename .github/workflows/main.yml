@@ -2,7 +2,7 @@ name: Muñetips NBA Cloud Scanner (24/7 Sin PC)
 
 on:
   schedule:
-    - cron: '5,35 15-23,0-2 * * *'
+    - cron: '*/30 * * * *'
 
   workflow_dispatch:
     inputs:
@@ -55,5 +55,5 @@ jobs:
           git config user.email "bot@munetips.local"
           mkdir -p data
           git add data/ || true
-          git diff --staged --quiet || git commit -m "chore(data): actualizar caché de lesiones y bitácora CLV [skip ci]"
+          git diff --staged --quiet || git commit -m "chore(data): actualizar bitacora CLV"
           git push || true
