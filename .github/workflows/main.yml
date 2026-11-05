@@ -1,13 +1,14 @@
-name: Muñetips NBA Cloud Scanner (24/7 Sin PC)
+name: Munetips NBA Cloud Scanner (24/7 Sin PC)
 
 on:
   schedule:
-    - cron: '*/30 * * * *'
+    # Ejecuta en minutos fuera de hora pico (:12 y :42) para evitar retrasos en la cola de GitHub
+    - cron: '12,42 * * * *'
 
   workflow_dispatch:
     inputs:
       modo:
-        description: 'Modo de ejecución'
+        description: 'Modo de ejecucion'
         required: true
         default: 'scan'
         type: choice
@@ -25,7 +26,7 @@ jobs:
     timeout-minutes: 5
 
     steps:
-      - name: Descargar código del repositorio
+      - name: Descargar codigo del repositorio
         uses: actions/checkout@v4
 
       - name: Configurar Python 3.12
@@ -33,7 +34,7 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Ejecutar Agente Cuantitativo Muñetips
+      - name: Ejecutar Agente Cuantitativo Munetips
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -49,9 +50,9 @@ jobs:
             python main.py --scan
           fi
 
-      - name: Guardar bitácora CLV y caché de lesiones
+      - name: Guardar bitacora CLV y cache de lesiones
         run: |
-          git config user.name "Muñetips Quant Bot"
+          git config user.name "Munetips Quant Bot"
           git config user.email "bot@munetips.local"
           mkdir -p data
           git add data/ || true
