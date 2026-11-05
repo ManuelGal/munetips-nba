@@ -1,0 +1,5 @@
+id_unico,fecha_utc,jugador,equipo,rival,mercado,lado,linea_playdoit,cuota_playdoit,linea_sharp_fanduel,prob_justa_sharp,lambda_poisson,prob_modelo_final,ev_pct,score_1_a_10,stake_sugerido_mxn,motivo
+2026-11-05|Anthony Black|player_assists|OVER|4.5,2026-11-05 21:48:02,Anthony Black,ORL,PHX,player_assists,OVER,4.5,2.3,4.5,0.4635,4.594,0.4635,0.066,8.3,20.0,Cuota desfasada en Playdoit (2.30) vs consenso Sharp
+2026-11-05|Desmond Bane|player_rebounds|UNDER|4.5,2026-11-05 21:48:03,Desmond Bane,ORL,PHX,player_rebounds,UNDER,4.5,1.83,4.5,0.571,4.401,0.571,0.045,8.2,20.0,Valor en UNDER (1.83) + bono de +1.8% por regla de lesión Playdoit
+2026-11-05|Bam Adebayo|player_assists|UNDER|3.5,2026-11-05 21:48:03,Bam Adebayo,MIA,GS,player_assists,UNDER,3.5,1.8,3.5,0.5799,3.372,0.5799,0.0438,8.2,20.0,Valor en UNDER (1.80) + bono de +1.8% por regla de lesión Playdoit
+2026-11-05|Jalen Green|player_rebounds|UNDER|3.5,2026-11-05 21:48:04,Jalen Green,PHX,ORL,player_rebounds,UNDER,3.5,2.0,3.5,0.5208,3.706,0.5208,0.0417,8.1,20.0,Valor en UNDER (2.00) + bono de +1.8% por regla de lesión Playdoit
