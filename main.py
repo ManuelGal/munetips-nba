@@ -172,36 +172,11 @@ def ejecutar_escaneo_vivo() -> None:
     print(f"[MODELO POISSON] Oportunidades que superan Score >= {config.MIN_SCORE_FOR_ALERT}/10: {len(oportunidades)}")
 
     enviadas = 0
-    for op in oportunidades[:4]:  # Máximo 4 mejores alertas por ventana
+    for op in oportunidades[:3]:  # Máximo 3 mejores alertas por ventana
         if registrar_pick_csv(op):
             mensaje = formatear_mensaje_munetips(op)
             if enviar_alerta_telegram(mensaje):
                 enviadas += 1
-
-    # Si no hubo ninguna apuesta >= 6.5/10, enviar reporte corto de vigilancia a Telegram
-    # para que siempre sepas en tu celular que el bot sí corrió y qué vio en el mercado.
-    if enviadas == 0:
-        resumen_partidos = (
-            ", ".join(f"{p.away_team}@{p.home_team}" for p in partidos[:8])
-            if partidos
-            else "Sin partidos programados hoy"
-        )
-        resumen_bajas = (
-            ", ".join(bajas_lista[:8])
-            if bajas_lista
-            else "Ningún titular confirmado OUT todavía"
-        )
-        msg_estado = (
-            f"📡 *REPORTE DE VIGILANCIA — {config.CHANNEL_NAME.upper()}*\n"
-            f"━━━━━━━━━━━━━━━━━━━━━━\n"
-            f"🏀 *Partidos NBA hoy ({len(partidos)}):* {resumen_partidos}\n"
-            f"🚑 *Bajas clave detectadas ({len(bajas_lista)}):* {resumen_bajas}\n"
-            f"🎯 *Apuestas con Score >= {config.MIN_SCORE_FOR_ALERT}/10:* `0`\n"
-            f"━━━━━━━━━━━━━━━━━━━━━━\n"
-            f"🛡️ _Ninguna línea de Playdoit tiene todavía ventaja matemática suficiente. "
-            f"Cuidando banca (${config.BANKROLL_MXN:.0f} MXN) hasta el próximo corte de lesiones._"
-        )
-        enviar_alerta_telegram(msg_estado)
 
     print(f"[FIN] Alertas nuevas enviadas al canal '{config.CHANNEL_NAME}': {enviadas}")
 
