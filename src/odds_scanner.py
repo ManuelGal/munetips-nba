@@ -132,7 +132,7 @@ def _procesar_libro_evento(
 
         for mkt in bm.get("markets", []):
             m_key = mkt.get("key", "")
-            por_jugador: dict[str, dict] = {}
+            por_jugador_y_linea: dict[tuple[str, float], dict] = {}
             for outc in mkt.get("outcomes", []):
                 p_name = outc.get("description", "")
                 p_norm = normalizar_nombre(p_name)
@@ -141,15 +141,21 @@ def _procesar_libro_evento(
                 price = outc.get("price")
                 if not p_norm or point is None or price is None:
                     continue
-                por_jugador.setdefault(p_norm, {"raw_name": p_name, "line": float(point)})
+                pt_val = float(point)
+                clave_jl = (p_norm, pt_val)
+                por_jugador_y_linea.setdefault(clave_jl, {"raw_name": p_name, "p_norm": p_norm, "line": pt_val})
                 if side == "OVER":
-                    por_jugador[p_norm]["over"] = float(price)
+                    por_jugador_y_linea[clave_jl]["over"] = float(price)
                 elif side == "UNDER":
-                    por_jugador[p_norm]["under"] = float(price)
+                    por_jugador_y_linea[clave_jl]["under"] = float(price)
 
-            for p_norm, info in por_jugador.items():
+            for (_, _), info in por_jugador_y_linea.items():
                 if "over" not in info or "under" not in info:
                     continue
+                # Solo conservar líneas principales equilibradas (ambos lados entre 1.50 y 2.55)
+                if not (1.50 <= info["over"] <= 2.55 and 1.50 <= info["under"] <= 2.55):
+                    continue
+                p_norm = info["p_norm"]
                 par_key = (m_key, p_norm)
                 mapa_cuotas.setdefault(par_key, {"raw_name": info["raw_name"]})
                 if es_sharp and ("sharp" not in mapa_cuotas[par_key] or bm_key == "fanduel"):
