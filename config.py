@@ -57,11 +57,13 @@ STAKE_ROUNDING_BASE = 10.0    # Redondear siempre a múltiplos de $10 MXN ($20, 
 LEAGUE_AVG_PACE = 99.5
 BLOWOUT_SPREAD_THRESHOLD = 9.5      # A partir de -9.5 pts de spread, sube el riesgo de banca en 4to cuarto
 BLOWOUT_MINUTES_PENALTY_PER_PT = 0.32  # Minutos descontados al titular por cada punto de spread > 9.5
-OVERDISPERSION_ALPHA_REB = 0.08     # Factor de sobredispersión para rebotes (Binomial Negativa)
-OVERDISPERSION_ALPHA_AST = 0.06     # Factor de sobredispersión para asistencias
+OVERDISPERSION_ALPHA_PTS = 0.09     # Factor de sobredispersión para Puntos de Jugador
+OVERDISPERSION_ALPHA_REB = 0.08     # Factor de sobredispersión para Rebotes (Binomial Negativa)
+OVERDISPERSION_ALPHA_AST = 0.06     # Factor de sobredispersión para Asistencias
 
-# Mercados objetivo (evitamos Puntos por exceso de varianza y vigilancia de traders)
+# Mercados objetivo que SÍ abre Playdoit bajo las pestañas "... de Jugador Más de/Menos de (incl. prórroga)"
 TARGET_MARKETS = [
+    "player_points",
     "player_rebounds",
     "player_assists",
 ]
