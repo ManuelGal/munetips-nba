@@ -33,10 +33,11 @@ MIN_PLAYDOIT_ODDS_DECIMAL = 1.77
 MAX_PLAYDOIT_ODDS_DECIMAL = 2.45
 
 # Asimetría de reglas de lesión en Playdoit (NO tiene Prop Protect como bet365):
-# - En OVER: si el jugador se lesiona en el 1er cuarto, pierdes. Exigimos mayor ventaja (+6.0% EV).
-# - En UNDER: lesión temprana, faltas o paliza (blowout) te hacen ganar. Exigimos +4.2% EV.
-MIN_EV_OVER = 0.060   # +6.0% Valor Esperado mínimo para OVERS
-MIN_EV_UNDER = 0.042  # +4.2% Valor Esperado mínimo para UNDERS
+# - Como el modelo ya ancla a la línea sin vig de FanDuel y aplica ±1.8% por regla de lesión:
+# - En UNDER: exigimos +1.5% de ventaja neta sobre FanDuel sin vig.
+# - En OVER: exigimos +2.5% de ventaja neta sobre FanDuel sin vig (tras descontar -1.8% de lesión).
+MIN_EV_OVER = 0.025   # +2.5% Valor Esperado neto mínimo para OVERS
+MIN_EV_UNDER = 0.015  # +1.5% Valor Esperado neto mínimo para UNDERS
 
 # Filtro de alerta al celular: solo notificar en "Muñetips" si el Score (1 a 10) >= 6.5
 MIN_SCORE_FOR_ALERT = 6.5
