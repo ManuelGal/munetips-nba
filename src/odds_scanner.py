@@ -1,8 +1,7 @@
 """
 Escáner de Cuotas NBA Player Props con Protector de Créditos (The Odds API + Feed B2B Altenar/Playdoit).
-- Primero filtra partidos usando `nba_data.py` (0 créditos consumidos).
-- Solo consulta cuotas de Player Props en partidos con catalizador de lesión o desfase activo.
-- Compara el Ancla Sharp (FanDuel + Pinnacle) contra la línea blanda (Playdoit / Altenar B2B).
+- Ancla la tasa base por minuto de cada jugador a su rendimiento real implícito en el mercado Sharp
+  y aplica encima los shocks cuantitativos (bajas confirmadas OUT, riesgo de Blowout por Spread y desfase de línea).
 """
 import json
 import urllib.parse
@@ -13,12 +12,13 @@ from src.nba_data import NBAGameContext, normalizar_nombre
 from src.model_poisson import (
     PlayerProjectionInput,
     PropEvaluationResult,
+    calcular_lambda_implicita_sharp,
     evaluar_oportunidad_prop,
+    quitar_margen_casa,
 )
 
 
 SHARP_BOOKS = ("fanduel", "pinnacle", "draftkings")
-# Proveedores que comparten el mismo feed secundario B2B de Player Props que Altenar (Playdoit)
 SOFT_ALTENAR_PROXY_BOOKS = ("betonlineag", "bovada", "mybookieag", "betmgm", "williamhill_us")
 
 
@@ -42,11 +42,11 @@ def escanear_mercados_reales(
     partidos: list[NBAGameContext],
 ) -> list[PropEvaluationResult]:
     """
-    Consulta The Odds API únicamente para los partidos del día con catalizador de minutos
-    o riesgo de blowout, protegiendo los 500 créditos mensuales gratuitos.
+    Consulta The Odds API para los partidos de NBA de hoy y evalúa desfases entre
+    el Ancla Sharp (FanDuel/Pinnacle) y el feed blando (Playdoit / Altenar B2B).
     """
     if not config.ODDS_API_KEY:
-        print("[INFO] Sin ODDS_API_KEY configurada. Usa --demo para probar alertas reales en Telegram.")
+        print("[INFO] Sin ODDS_API_KEY configurada.")
         return []
 
     url_events = (
@@ -67,28 +67,28 @@ def escanear_mercados_reales(
     oportunidades: list[PropEvaluationResult] = []
     mercados_str = ",".join(config.TARGET_MARKETS)
 
+    # Mapear partidos por equipos para no repetir el mismo evento de The Odds API
+    eventos_visitados: set[str] = set()
+
     for ctx in partidos:
-        # Ahorro extremo de créditos: solo escanear partidos donde hay al menos 1 titular OUT
-        # o un spread de paliza (>= 10.5 pts)
-        if not ctx.newly_out_starters and abs(ctx.home_spread) < 10.5:
+        if not ctx.newly_out_starters and abs(ctx.home_spread) < 9.5 and len(partidos) > 4:
             continue
 
-        # Emparejar evento con The Odds API
         ev_id = None
         for ev in eventos_api:
-            ev_id = ev.get("id")
-            break  # Se refina por coincidencia de equipos abajo
-
-        for ev in eventos_api:
+            eid = ev.get("id")
+            if not eid or eid in eventos_visitados:
+                continue
             h_name = (ev.get("home_team") or "").upper()
             a_name = (ev.get("away_team") or "").upper()
-            if ctx.home_team in h_name or ctx.away_team in a_name or len(eventos_api) <= 15:
-                ev_id = ev.get("id")
+            if ctx.home_team in h_name or ctx.away_team in a_name or len(eventos_api) <= 12:
+                ev_id = eid
                 break
 
         if not ev_id:
             continue
 
+        eventos_visitados.add(ev_id)
         url_props = (
             f"https://api.the-odds-api.com/v4/sports/basketball_nba/events/{ev_id}/odds"
             f"?apiKey={urllib.parse.quote(config.ODDS_API_KEY)}"
@@ -114,7 +114,6 @@ def _procesar_libro_evento(
     if not bookmakers:
         return []
 
-    # Estructura: {(market_key, player_norm): {"sharp": (line, over, under), "soft": (line, over, under)}}
     mapa_cuotas: dict[tuple[str, str], dict] = {}
 
     for bm in bookmakers:
@@ -146,14 +145,13 @@ def _procesar_libro_evento(
                     continue
                 par_key = (m_key, p_norm)
                 mapa_cuotas.setdefault(par_key, {"raw_name": info["raw_name"]})
-                # Priorizar FanDuel como ancla sharp #1
                 if es_sharp and ("sharp" not in mapa_cuotas[par_key] or bm_key == "fanduel"):
                     mapa_cuotas[par_key]["sharp"] = (info["line"], info["over"], info["under"])
                 elif es_soft and "soft" not in mapa_cuotas[par_key]:
                     mapa_cuotas[par_key]["soft"] = (info["line"], info["over"], info["under"])
 
     resultados: list[PropEvaluationResult] = []
-    titular_baja = ctx.newly_out_starters[0] if ctx.newly_out_starters else None
+    titulares_baja_por_equipo = {b.team_abbr: b for b in ctx.newly_out_starters}
 
     for (m_key, p_norm), libros in mapa_cuotas.items():
         if "sharp" not in libros or "soft" not in libros:
@@ -163,34 +161,33 @@ def _procesar_libro_evento(
         soft_line, soft_ov, soft_un = libros["soft"]
 
         perfil = ctx.active_players.get(p_norm)
-        es_titular = perfil.is_starter if perfil else False
-        base_min = perfil.avg_minutes if perfil else (soft_line * 4.8)
-        tasa_min = (
-            (perfil.reb_per_min if m_key == "player_rebounds" else perfil.ast_per_min)
-            if perfil
-            else (sharp_line / max(18.0, base_min))
-        )
+        es_titular = perfil.is_starter if perfil else (sharp_line >= 5.5)
+        base_min = perfil.avg_minutes if perfil else (31.0 if es_titular else 22.0)
 
-        mismo_equipo_baja = (
-            titular_baja is not None
-            and perfil is not None
-            and titular_baja.team_abbr == perfil.team_abbr
-        )
+        # Anclar la tasa base por minuto a la media implícita sin vig del mercado Sharp
+        # para evitar sesgos de posición en jugadores atípicos (ej. point-forwards)
+        sharp_p_over, _ = quitar_margen_casa(sharp_ov, sharp_un)
+        sharp_lambda_base = calcular_lambda_implicita_sharp(sharp_p_over, sharp_line, m_key)
+        tasa_min_real = sharp_lambda_base / max(15.0, base_min)
+
+        equipo_jug = perfil.team_abbr if perfil else ctx.home_team
+        rival_jug = ctx.away_team if equipo_jug == ctx.home_team else ctx.home_team
+        baja_equipo = titulares_baja_por_equipo.get(equipo_jug)
 
         inp = PlayerProjectionInput(
             player_name=libros["raw_name"],
-            team_abbr=perfil.team_abbr if perfil else ctx.home_team,
-            opponent_abbr=ctx.away_team if (perfil and perfil.team_abbr == ctx.home_team) else ctx.home_team,
+            team_abbr=equipo_jug,
+            opponent_abbr=rival_jug,
             market_type=m_key,
             is_starter=es_titular,
             base_minutes=base_min,
-            rate_per_minute=tasa_min,
+            rate_per_minute=tasa_min_real,
             team_pace=ctx.estimated_pace,
             opp_pace=ctx.estimated_pace,
             game_spread=ctx.home_spread,
-            teammate_out_name=titular_baja.player_name if mismo_equipo_baja else None,
-            teammate_out_minutes=titular_baja.avg_minutes if mismo_equipo_baja else 0.0,
-            usage_boost_factor=1.12 if mismo_equipo_baja else 1.0,
+            teammate_out_name=baja_equipo.player_name if baja_equipo else None,
+            teammate_out_minutes=baja_equipo.avg_minutes if baja_equipo else 0.0,
+            usage_boost_factor=1.06 if baja_equipo else 1.0,
             is_two_way_contract=perfil.is_two_way if perfil else False,
         )
 
