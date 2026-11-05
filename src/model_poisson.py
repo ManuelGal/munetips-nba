@@ -181,6 +181,23 @@ def quitar_margen_casa(cuota_over: float, cuota_under: float) -> tuple[float, fl
     return imp_over / total, imp_under / total
 
 
+def calcular_lambda_implicita_sharp(
+    sharp_prob_over_en_su_linea: float,
+    sharp_line: float,
+    market_type: str,
+) -> float:
+    """Obtiene la media implícita (λ) del mercado Sharp (FanDuel/Pinnacle) mediante bisección."""
+    low, high = 0.3, 25.0
+    for _ in range(18):
+        mid = (low + high) / 2.0
+        p_ov, _ = calcular_probabilidad_linea(mid, sharp_line, market_type)
+        if p_ov < sharp_prob_over_en_su_linea:
+            low = mid
+        else:
+            high = mid
+    return (low + high) / 2.0
+
+
 def ajustar_prob_sharp_por_diferencia_de_linea(
     sharp_prob_over_en_su_linea: float,
     sharp_line: float,
@@ -194,18 +211,9 @@ def ajustar_prob_sharp_por_diferencia_de_linea(
     if abs(sharp_line - playdoit_line) < 0.05:
         return sharp_prob_over_en_su_linea, 1.0 - sharp_prob_over_en_su_linea
 
-    # Buscamos la lambda implícita de FanDuel por bisección rápida (15 iteraciones)
-    low, high = 0.3, 25.0
-    for _ in range(18):
-        mid = (low + high) / 2.0
-        p_ov, _ = calcular_probabilidad_linea(mid, sharp_line, market_type)
-        if p_ov < sharp_prob_over_en_su_linea:
-            low = mid
-        else:
-            high = mid
-    sharp_implied_lambda = (low + high) / 2.0
-
-    # Evaluamos esa lambda implícita de FanDuel contra la línea atrasada de Playdoit
+    sharp_implied_lambda = calcular_lambda_implicita_sharp(
+        sharp_prob_over_en_su_linea, sharp_line, market_type
+    )
     return calcular_probabilidad_linea(sharp_implied_lambda, playdoit_line, market_type)
 
 
