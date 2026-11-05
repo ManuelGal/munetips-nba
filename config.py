@@ -12,7 +12,7 @@ USER_PHONE_REFERENCE = "+525539936844"
 
 # Se leen desde variables de entorno (GitHub Secrets en la nube) o archivo .env local
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "").strip()  # Ej: "-1001234567890" o "@munetips"
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "@munetipsfc").strip()  # Canal: https://t.me/munetipsfc
 
 # ==============================================================================
 # 2. API KEYS DE DATOS Y LLM (OPCIONAL, TIER GRATUITO)
