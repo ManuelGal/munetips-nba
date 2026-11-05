@@ -75,13 +75,20 @@ def escanear_mercados_reales(
             continue
 
         ev_id = None
+        h_full_target = ctx.home_team_full.lower().strip()
+        a_full_target = ctx.away_team_full.lower().strip()
         for ev in eventos_api:
             eid = ev.get("id")
             if not eid or eid in eventos_visitados:
                 continue
-            h_name = (ev.get("home_team") or "").upper()
-            a_name = (ev.get("away_team") or "").upper()
-            if ctx.home_team in h_name or ctx.away_team in a_name or len(eventos_api) <= 12:
+            h_name = (ev.get("home_team") or "").lower().strip()
+            a_name = (ev.get("away_team") or "").lower().strip()
+            if (
+                h_full_target == h_name
+                or a_full_target == a_name
+                or (h_full_target and h_full_target.split()[-1] in h_name)
+                or (a_full_target and a_full_target.split()[-1] in a_name)
+            ):
                 ev_id = eid
                 break
 
