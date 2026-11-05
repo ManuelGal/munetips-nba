@@ -2,7 +2,6 @@ name: Munetips NBA Cloud Scanner (24/7 Sin PC)
 
 on:
   schedule:
-    # Ejecuta en minutos fuera de hora pico (:12 y :42) para evitar retrasos en la cola de GitHub
     - cron: '12,42 * * * *'
 
   workflow_dispatch:
@@ -20,10 +19,14 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: munetips-nba-scanner-${{ github.event.inputs.modo || 'scan' }}
+  cancel-in-progress: false
+
 jobs:
   escanear_nba_playdoit:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 350
 
     steps:
       - name: Descargar codigo del repositorio
@@ -34,7 +37,7 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Ejecutar Agente Cuantitativo Munetips
+      - name: Ejecutar Agente Cuantitativo Munetips (Ciclo Continuo cada 30 min)
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -42,19 +45,38 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           BANKROLL_MXN: '200.0'
         run: |
-          if [ "${{ github.event.inputs.modo }}" = "demo" ]; then
-            python main.py --demo
-          elif [ "${{ github.event.inputs.modo }}" = "find-channel" ]; then
-            python main.py --find-channel
-          else
-            python main.py --scan
-          fi
-
-      - name: Guardar bitacora CLV y cache de lesiones
-        run: |
           git config user.name "Munetips Quant Bot"
           git config user.email "bot@munetips.local"
-          mkdir -p data
-          git add data/ || true
-          git diff --staged --quiet || git commit -m "chore(data): actualizar bitacora CLV"
-          git push || true
+
+          MODO="${{ github.event.inputs.modo }}"
+          if [ "$MODO" = "demo" ]; then
+            python main.py --demo
+            exit 0
+          elif [ "$MODO" = "find-channel" ]; then
+            python main.py --find-channel
+            exit 0
+          fi
+
+          # Ciclo automatico cada 30 minutos durante la jornada NBA (hasta 10 cortes = 5 horas por bloque)
+          for i in 1 2 3 4 5 6 7 8 9 10; do
+            HORA_UTC=$(date -u +%H)
+            echo "=== Corte #$i (Hora UTC: $HORA_UTC) ==="
+
+            # Horario activo NBA: 14:00 UTC a 03:59 UTC (8:00 AM a 9:59 PM CDMX)
+            if [ "$HORA_UTC" -ge 14 ] || [ "$HORA_UTC" -le 3 ]; then
+              git pull --rebase origin main || true
+              python main.py --scan
+              mkdir -p data
+              git add data/ || true
+              git diff --staged --quiet || git commit -m "chore(data): actualizar bitacora CLV"
+              git push origin main || true
+            else
+              echo "Fuera de horario NBA (Madrugada CDMX). Cerrando bloque."
+              break
+            fi
+
+            if [ "$i" -lt 10 ]; then
+              echo "Esperando 30 minutos exactos para el siguiente escaneo..."
+              sleep 1800
+            fi
+          done
