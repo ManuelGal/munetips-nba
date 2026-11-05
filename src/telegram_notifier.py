@@ -71,7 +71,11 @@ def enviar_alerta_telegram(
 ) -> bool:
     """Envía el mensaje en formato Markdown al canal 'Muñetips'."""
     token = (bot_token or config.TELEGRAM_BOT_TOKEN).strip()
-    destino = (chat_id or config.TELEGRAM_CHAT_ID).strip()
+    destino = (chat_id or config.TELEGRAM_CHAT_ID or "@munetipsfc").strip()
+    if destino.startswith("https://t.me/"):
+        destino = "@" + destino.replace("https://t.me/", "").strip("/")
+    elif destino.startswith("t.me/"):
+        destino = "@" + destino.replace("t.me/", "").strip("/")
 
     if not token or not destino:
         print(
