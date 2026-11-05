@@ -1,2 +1,6 @@
 id_unico,fecha_utc,jugador,equipo,rival,mercado,lado,linea_playdoit,cuota_playdoit,linea_sharp_fanduel,prob_justa_sharp,lambda_poisson,prob_modelo_final,ev_pct,score_1_a_10,stake_sugerido_mxn,motivo
 2026-11-05|Franz Wagner|player_assists|UNDER|6.5,2026-11-05 21:24:55,Franz Wagner,ORL,PHX,player_assists,UNDER,6.5,2.07,6.5,0.5037,6.847,0.5038,0.0428,6.6,20.0,Valor en UNDER (2.07) + bono de +1.8% por regla de lesión Playdoit
+2026-11-05|Desmond Bane|player_assists|OVER|2.5,2026-11-05 21:28:58,Desmond Bane,ORL,PHX,player_assists,OVER,2.5,1.95,3.5,0.6539,3.578,0.6539,0.275,9.9,20.0,Línea atrasada en Playdoit (2.5) vs FanDuel (3.5)
+2026-11-05|Franz Wagner|player_assists|OVER|5.5,2026-11-05 21:28:58,Franz Wagner,ORL,PHX,player_assists,OVER,5.5,2.35,6.5,0.6261,6.847,0.6261,0.4713,9.9,20.0,Línea atrasada en Playdoit (5.5) vs FanDuel (6.5)
+2026-11-05|Anthony Black|player_assists|OVER|3.5,2026-11-05 21:28:59,Anthony Black,ORL,PHX,player_assists,OVER,3.5,2.45,4.5,0.6302,4.594,0.6302,0.544,9.9,20.0,Línea atrasada en Playdoit (3.5) vs FanDuel (4.5)
+2026-11-05|Dillon Brooks|player_assists|OVER|1.5,2026-11-05 21:28:59,Dillon Brooks,PHX,ORL,player_assists,OVER,1.5,2.35,2.5,0.6472,2.343,0.6471,0.5208,9.9,20.0,Línea atrasada en Playdoit (1.5) vs FanDuel (2.5)
