@@ -175,8 +175,21 @@ def _procesar_libro_evento(
         sharp_line, sharp_ov, sharp_un = libros["sharp"]
 
         perfil = ctx.active_players.get(p_norm)
-        es_titular = perfil.is_starter if perfil else (sharp_line >= 5.5)
-        base_min = perfil.avg_minutes if perfil else (31.0 if es_titular else 22.0)
+        es_titular = perfil.is_starter if perfil else (sharp_line >= 15.5)
+
+        # Filtro de Catálogo Playdoit (Altenar):
+        # Playdoit bloquea con candado (🔒) o no abre líneas Más de/Menos de para jugadores secundarios
+        # ni líneas bajas (como <4.5 asistencias o <5.5 rebotes). Solo evaluar titulares con línea principal abierta:
+        if not es_titular:
+            continue
+        if m_key == "player_points" and sharp_line < 14.5:
+            continue
+        if m_key == "player_rebounds" and sharp_line < 5.5:
+            continue
+        if m_key == "player_assists" and sharp_line < 4.5:
+            continue
+
+        base_min = perfil.avg_minutes if perfil else 32.0
 
         sharp_p_over, _ = quitar_margen_casa(sharp_ov, sharp_un)
         sharp_lambda_base = calcular_lambda_implicita_sharp(sharp_p_over, sharp_line, m_key)
