@@ -154,25 +154,24 @@ def _procesar_libro_evento(
                 mapa_cuotas.setdefault(par_key, {"raw_name": info["raw_name"]})
                 if es_sharp and ("sharp" not in mapa_cuotas[par_key] or bm_key == "fanduel"):
                     mapa_cuotas[par_key]["sharp"] = (info["line"], info["over"], info["under"])
-                elif es_soft and "soft" not in mapa_cuotas[par_key]:
-                    mapa_cuotas[par_key]["soft"] = (info["line"], info["over"], info["under"])
+                elif es_soft:
+                    mapa_cuotas[par_key].setdefault("soft_list", []).append(
+                        (info["line"], info["over"], info["under"])
+                    )
 
     resultados: list[PropEvaluationResult] = []
     titulares_baja_por_equipo = {b.team_abbr: b for b in ctx.newly_out_starters}
 
     for (m_key, p_norm), libros in mapa_cuotas.items():
-        if "sharp" not in libros or "soft" not in libros:
+        if "sharp" not in libros or "soft_list" not in libros:
             continue
 
         sharp_line, sharp_ov, sharp_un = libros["sharp"]
-        soft_line, soft_ov, soft_un = libros["soft"]
 
         perfil = ctx.active_players.get(p_norm)
         es_titular = perfil.is_starter if perfil else (sharp_line >= 5.5)
         base_min = perfil.avg_minutes if perfil else (31.0 if es_titular else 22.0)
 
-        # Anclar la tasa base por minuto a la media implícita sin vig del mercado Sharp
-        # para evitar sesgos de posición en jugadores atípicos (ej. point-forwards)
         sharp_p_over, _ = quitar_margen_casa(sharp_ov, sharp_un)
         sharp_lambda_base = calcular_lambda_implicita_sharp(sharp_p_over, sharp_line, m_key)
         tasa_min_real = sharp_lambda_base / max(15.0, base_min)
@@ -200,17 +199,28 @@ def _procesar_libro_evento(
             is_two_way_contract=perfil.is_two_way if perfil else False,
         )
 
-        evaluacion = evaluar_oportunidad_prop(
-            inp=inp,
-            playdoit_line=soft_line,
-            playdoit_over_odds=soft_ov,
-            playdoit_under_odds=soft_un,
-            sharp_line=sharp_line,
-            sharp_over_odds=sharp_ov,
-            sharp_under_odds=sharp_un,
-        )
+        mejor_eval_jugador: Optional[PropEvaluationResult] = None
+        for soft_line, soft_ov, soft_un in libros["soft_list"]:
+            evaluacion = evaluar_oportunidad_prop(
+                inp=inp,
+                playdoit_line=soft_line,
+                playdoit_over_odds=soft_ov,
+                playdoit_under_odds=soft_un,
+                sharp_line=sharp_line,
+                sharp_over_odds=sharp_ov,
+                sharp_under_odds=sharp_un,
+            )
+            if evaluacion and (
+                mejor_eval_jugador is None
+                or evaluacion.score_1_to_10 > mejor_eval_jugador.score_1_to_10
+                or (
+                    evaluacion.score_1_to_10 == mejor_eval_jugador.score_1_to_10
+                    and evaluacion.ev_pct > mejor_eval_jugador.ev_pct
+                )
+            ):
+                mejor_eval_jugador = evaluacion
 
-        if evaluacion and evaluacion.score_1_to_10 >= config.MIN_SCORE_FOR_ALERT:
-            resultados.append(evaluacion)
+        if mejor_eval_jugador and mejor_eval_jugador.score_1_to_10 >= config.MIN_SCORE_FOR_ALERT:
+            resultados.append(mejor_eval_jugador)
 
     return resultados
