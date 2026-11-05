@@ -1,0 +1,63 @@
+name: Muñetips NBA Cloud Scanner (24/7 Sin PC)
+
+on:
+  schedule:
+    - cron: '35 15 * * *'
+    - cron: '35 18,20,21,22 * * *'
+    - cron: '5 22 * * *'
+    - cron: '20 23 * * *'
+    - cron: '20 0,2 * * *'
+
+  workflow_dispatch:
+    inputs:
+      modo:
+        description: 'Modo de ejecución'
+        required: true
+        default: 'scan'
+        type: choice
+        options:
+          - scan
+          - demo
+          - find-channel
+
+permissions:
+  contents: write
+
+jobs:
+  escanear_nba_playdoit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Descargar código del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Ejecutar Agente Cuantitativo Muñetips
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          BANKROLL_MXN: '200.0'
+        run: |
+          if [ "${{ github.event.inputs.modo }}" = "demo" ]; then
+            python main.py --demo
+          elif [ "${{ github.event.inputs.modo }}" = "find-channel" ]; then
+            python main.py --find-channel
+          else
+            python main.py --scan
+          fi
+
+      - name: Guardar bitácora CLV y caché de lesiones
+        run: |
+          git config user.name "Muñetips Quant Bot"
+          git config user.email "bot@munetips.local"
+          mkdir -p data
+          git add data/ || true
+          git diff --staged --quiet || git commit -m "chore(data): actualizar caché de lesiones y bitácora CLV [skip ci]"
+          git push || true
