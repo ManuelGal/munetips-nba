@@ -62,8 +62,12 @@ jobs:
           fi
 
           git pull --rebase origin main || true
+          # 1. Auditar y calificar automáticamente los partidos finalizados en ESPN Boxscore
+          python scripts/verificar_resultados.py || true
+
+          # 2. Escanear nuevos mercados en vivo
           python main.py --scan
           mkdir -p data
           git add data/ || true
-          git diff --staged --quiet || git commit -m "chore(data): actualizar bitacora CLV y cache NBA"
+          git diff --staged --quiet || git commit -m "chore(data): actualizar bitacora CLV, resultados y cache NBA"
           git push origin main || true

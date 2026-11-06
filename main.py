@@ -179,6 +179,9 @@ def ejecutar_escaneo_vivo() -> None:
     oportunidades = escanear_mercados_reales(partidos)
     print(f"[MODELO POISSON] Oportunidades que superan Score >= {config.MIN_SCORE_FOR_ALERT}/10: {len(oportunidades)}")
 
+    # Ordenar de mayor a menor calidad cuantitativa (Score, EV y Probabilidad de Acierto)
+    oportunidades.sort(key=lambda op: (op.score_1_to_10, op.ev_pct, op.blended_prob), reverse=True)
+
     enviadas = 0
     for op in oportunidades[:3]:  # Máximo 3 mejores alertas por ventana
         if registrar_pick_csv(op):

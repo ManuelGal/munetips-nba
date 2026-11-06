@@ -443,6 +443,7 @@ def calcular_ev_real_playdoit(
 
 def calcular_score_1_a_10(
     ev_pct: float,
+    win_prob: float,
     side: str,
     playdoit_line: float,
     sharp_line: float,
@@ -452,39 +453,56 @@ def calcular_score_1_a_10(
 ) -> float:
     """
     Escala calibrada 1 a 10 para el canal Muñetips.
+    Combina equilibradamente:
+    1. Valor Esperado (EV %): Rentabilidad matemática neta a largo plazo (4.0 a 7.5 pts base).
+    2. Probabilidad de Acierto (Win Prob): Confianza de acierto y protección de drawdown (0.0 a 1.6 pts).
+    3. Desfase de Línea Real vs Sharp: Ventaja directa sobre Pinnacle/FanDuel (0.0 a 0.5 pts).
+    4. Catalizadores Contextuales: Lesión confirmada y ventaja estructural Playdoit (0.0 a 0.4 pts).
+    
+    Esto evita que picks de 60% se inflen artificialmente al techo (9.8), reservando
+    las notas 9.3 a 9.9 exclusivamente para selecciones con alta probabilidad Y alto EV.
     """
-    if ev_pct < 0.015:
-        pts_ev = 4.5 + (ev_pct / 0.015) * 1.0
-    elif ev_pct < 0.035:
-        pts_ev = 5.8 + ((ev_pct - 0.015) / 0.020) * 1.1
-    elif ev_pct < 0.065:
-        pts_ev = 6.9 + ((ev_pct - 0.035) / 0.030) * 1.0
+    # 1. Base por EV neto
+    if ev_pct < 0.040:
+        pts_ev = 4.0 + (ev_pct / 0.040) * 1.0        # 4.0 a 5.0
+    elif ev_pct < 0.080:
+        pts_ev = 5.0 + ((ev_pct - 0.040) / 0.040) * 1.2  # 5.0 a 6.2
+    elif ev_pct < 0.140:
+        pts_ev = 6.2 + ((ev_pct - 0.080) / 0.060) * 1.0  # 6.2 a 7.2
     else:
-        pts_ev = min(8.5, 7.9 + (ev_pct - 0.065) * 5.0)
+        pts_ev = min(7.8, 7.2 + (ev_pct - 0.140) * 2.0)  # 7.2 a 7.8
 
+    # 2. Componente de Probabilidad de Acierto (Previa penalización / premio)
+    # Por debajo de 54% no suma; de 58% a 65% da soporte sólido; >68% impulsa a élite
+    if win_prob < 0.54:
+        pts_prob = 0.0
+    elif win_prob < 0.60:
+        pts_prob = 0.4 + ((win_prob - 0.54) / 0.06) * 0.4  # 0.4 a 0.8
+    elif win_prob < 0.68:
+        pts_prob = 0.8 + ((win_prob - 0.60) / 0.08) * 0.5  # 0.8 a 1.3
+    else:
+        pts_prob = min(1.6, 1.3 + ((win_prob - 0.68) / 0.10) * 0.3)  # 1.3 a 1.6
+
+    # 3. Ventaja de Línea sobre el Consenso Sharp
     ventaja_puntos = (sharp_line - playdoit_line) if side == "OVER" else (playdoit_line - sharp_line)
-    if ventaja_puntos >= 1.0:
-        pts_linea = 1.5
+    if ventaja_puntos >= 1.5:
+        pts_linea = 0.5
     elif ventaja_puntos >= 0.5:
-        pts_linea = 1.1
-    elif abs(ventaja_puntos) < 0.1:
-        pts_linea = 0.4
+        pts_linea = 0.3
     else:
         pts_linea = 0.0
 
+    # 4. Catalizador Contextual
     pts_contexto = 0.0
     if has_injury_catalyst:
-        pts_contexto += 0.7
+        pts_contexto += 0.25
 
     if side == "UNDER":
-        pts_contexto += 0.6  # Prioridad estructural a UNDERS en Playdoit por regla de lesión/faltas
+        pts_contexto += 0.15  # Ventaja contractual de regla lesión/faltas en Playdoit
         if is_starter and abs(game_spread) >= 9.5:
-            pts_contexto += 0.4
-    else:
-        if not is_starter and has_injury_catalyst:
-            pts_contexto += 0.4
+            pts_contexto += 0.10  # Riesgo real de blowout
 
-    raw_score = pts_ev + pts_linea + pts_contexto
+    raw_score = pts_ev + pts_prob + pts_linea + pts_contexto
     return round(min(9.9, max(1.0, raw_score)), 1)
 
 
@@ -607,8 +625,10 @@ def evaluar_oportunidad_prop(
             or (inp.teammates_out and len(inp.teammates_out) > 0)
             or inp.teammate_out_name
         )
+        prob_efectiva_mostrar = b_win_prob / max(0.01, 1.0 - b_void_prob)
         score = calcular_score_1_a_10(
             ev_pct=ev,
+            win_prob=prob_efectiva_mostrar,
             side=side,
             playdoit_line=playdoit_line,
             sharp_line=sharp_line,
@@ -623,7 +643,6 @@ def evaluar_oportunidad_prop(
         min_odds = max(config.MIN_PLAYDOIT_ODDS_DECIMAL, round(cuota_min_ev, 2))
 
         stake = calcular_stake_playdoit(b_win_prob, b_void_prob, odds)
-        prob_efectiva_mostrar = b_win_prob / max(0.01, 1.0 - b_void_prob)
 
         notas_alerta = list(notas)
         if abs(sharp_line - playdoit_line) >= 0.5:
