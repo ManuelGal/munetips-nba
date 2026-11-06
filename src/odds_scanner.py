@@ -1,15 +1,17 @@
 """
 Escáner de Cuotas NBA Player Props con Protector de Créditos (The Odds API `regions=us`).
-- Separa las Casas Sharp (`fanduel`, `pinnacle`, `draftkings`) de las Casas Recreativas Lentas
-  (`betmgm`, `williamhill_us`, `espnbet`, `betrivers`) para detectar tanto valor en la línea
-  principal como líneas rezagadas (>= 0.5 pts de desfase frente a FanDuel/Pinnacle).
+- Exclusivo para Playdoit.mx (motor Altenar).
+- Utiliza el Consenso Sharp Mundial (`fanduel`, `pinnacle`, `draftkings`, `betonlineag`, `lowvig`)
+  como ancla de referencia para fijar la línea real de mercado y su probabilidad limpia.
 - Alimenta el Modelo Estadístico Independiente (`model_poisson.py`) con los promedios y tasas
   por minuto reales de la temporada actual (ESPN Overview API), las bajas recientes con sinergia
-  posicional, y la asimetría contractual de Playdoit.mx.
+  posicional, y la asimetría contractual de Playdoit.mx (Void 1H en OVER / Win en UNDER).
+- Filtra partidos que ya comenzaron para proteger los créditos restantes de la API.
 """
 import json
 import urllib.parse
 import urllib.request
+from datetime import datetime, timezone
 from statistics import median
 from typing import Optional
 import config
@@ -23,9 +25,8 @@ from src.model_poisson import (
 )
 
 
-SHARP_PRIORITY_BOOKS = ("fanduel", "pinnacle", "draftkings")
-SLOWER_RECREATIONAL_BOOKS = ("betmgm", "williamhill_us", "espnbet", "betrivers")
-ALL_US_TRACKED_BOOKS = SHARP_PRIORITY_BOOKS + SLOWER_RECREATIONAL_BOOKS
+SHARP_PRIORITY_BOOKS = ("fanduel", "pinnacle", "draftkings", "betonlineag", "lowvig")
+ALL_US_TRACKED_BOOKS = SHARP_PRIORITY_BOOKS
 
 
 def _get_json(url: str) -> tuple[object, dict]:
@@ -90,8 +91,18 @@ def escanear_mercados_reales(
     oportunidades: list[PropEvaluationResult] = []
     mercados_str = ",".join(config.TARGET_MARKETS)
     eventos_visitados: set[str] = set()
+    now_utc = datetime.now(timezone.utc)
 
     for ctx in partidos:
+        # Protector de créditos: Omitir partidos que ya comenzaron
+        if ctx.start_time_utc:
+            try:
+                t_ctx = datetime.fromisoformat(ctx.start_time_utc.replace("Z", "+00:00"))
+                if t_ctx <= now_utc:
+                    continue
+            except Exception:
+                pass
+
         if not ctx.newly_out_starters and abs(ctx.home_spread) < 9.5 and len(partidos) > 4:
             continue
 
@@ -102,6 +113,16 @@ def escanear_mercados_reales(
             eid = ev.get("id")
             if not eid or eid in eventos_visitados:
                 continue
+
+            commence_str = ev.get("commence_time")
+            if commence_str:
+                try:
+                    t_comm = datetime.fromisoformat(commence_str.replace("Z", "+00:00"))
+                    if t_comm <= now_utc:
+                        continue
+                except Exception:
+                    pass
+
             h_name = (ev.get("home_team") or "").lower().strip()
             a_name = (ev.get("away_team") or "").lower().strip()
             if (
@@ -215,10 +236,10 @@ def _procesar_libro_evento(
         if not _cumple_umbral_catalogo_playdoit(m_key, sharp_line):
             continue
 
-        # 2. Construir líneas objetivo candidatas:
-        #    a) La línea principal Sharp (con cuota mediana conservadora topada en 1.87 / -115).
-        #    b) Líneas rezagadas en casas recreativas lentas (BetMGM, Caesars, ESPNBet, BetRivers)
-        #       que aún no se han movido a `sharp_line` (desfase >= 0.5 pts, típico de Altenar/Playdoit).
+        # 2. Construir la línea objetivo de Playdoit:
+        #    Se toma la línea principal del Consenso Sharp con cuota estándar de referencia
+        #    en Playdoit (Altenar), topada en el benchmark (1.87 / -115) y respetando
+        #    la regla de retiro de Playdoit (momio >= -130 / 1.77).
         misma_linea_sharp = [
             vals for vals in books_dict.values() if abs(vals[0] - sharp_line) < 0.05
         ]
@@ -229,25 +250,7 @@ def _procesar_libro_evento(
             sharp_line: (round(min(med_ov, benchmark_cap), 2), round(min(med_un, benchmark_cap), 2))
         }
 
-        por_linea_recreativa: dict[float, list[tuple[float, float]]] = {}
-        for rk in SLOWER_RECREATIONAL_BOOKS:
-            if rk in books_dict:
-                r_line, r_ov, r_un = books_dict[rk]
-                if (
-                    abs(r_line - sharp_line) >= 0.5
-                    and _cumple_umbral_catalogo_playdoit(m_key, r_line)
-                ):
-                    por_linea_recreativa.setdefault(r_line, []).append((r_ov, r_un))
-
-        for r_line, lista_precios in por_linea_recreativa.items():
-            r_med_ov = float(median([p[0] for p in lista_precios]))
-            r_med_un = float(median([p[1] for p in lista_precios]))
-            lineas_candidatas[r_line] = (
-                round(min(r_med_ov, benchmark_cap), 2),
-                round(min(r_med_un, benchmark_cap), 2),
-            )
-
-        # 3. Obtener estadísticas reales de temporada del jugador desde ESPN (independientes de FanDuel)
+        # 3. Obtener estadísticas reales de temporada del jugador desde ESPN (independientes de las casas)
         perfil = ctx.active_players.get(p_norm)
         if perfil and perfil.has_real_stats:
             es_titular = perfil.is_starter
@@ -303,7 +306,7 @@ def _procesar_libro_evento(
                 sharp_over_odds=sharp_ov,
                 sharp_under_odds=sharp_un,
             )
-            if evaluacion and (
+            if evaluacion and evaluacion.playdoit_odds >= config.MIN_PLAYDOIT_ODDS_DECIMAL and (
                 mejor_eval_jugador is None
                 or evaluacion.score_1_to_10 > mejor_eval_jugador.score_1_to_10
                 or (
