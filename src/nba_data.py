@@ -204,11 +204,16 @@ def obtener_estadisticas_reales_jugador(
 
         if names and elegida and len(names) == len(elegida):
             mapa = {str(k).upper(): v for k, v in zip(names, elegida)}
-            gp = _safe_float(mapa.get("GP"), 0.0)
-            avg_min = _safe_float(mapa.get("MIN"), 0.0)
-            avg_pts = _safe_float(mapa.get("PTS"), 0.0)
-            avg_reb = _safe_float(mapa.get("REB"), 0.0)
-            avg_ast = _safe_float(mapa.get("AST"), 0.0)
+            labels = stats_block.get("labels", [])
+            if labels and len(labels) == len(elegida):
+                for lk, lv in zip(labels, elegida):
+                    mapa[str(lk).upper()] = lv
+
+            gp = _safe_float(mapa.get("GP") or mapa.get("GAMESPLAYED"), 0.0)
+            avg_min = _safe_float(mapa.get("MIN") or mapa.get("AVGMINUTES"), 0.0)
+            avg_pts = _safe_float(mapa.get("PTS") or mapa.get("AVGPOINTS"), 0.0)
+            avg_reb = _safe_float(mapa.get("REB") or mapa.get("AVGREBOUNDS"), 0.0)
+            avg_ast = _safe_float(mapa.get("AST") or mapa.get("AVGASSISTS"), 0.0)
 
             if gp >= 1 and avg_min >= 8.0:
                 pts_pm = round(avg_pts / avg_min, 4)
