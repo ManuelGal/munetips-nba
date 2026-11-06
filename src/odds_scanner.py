@@ -125,12 +125,14 @@ def escanear_mercados_reales(
 
             h_name = (ev.get("home_team") or "").lower().strip()
             a_name = (ev.get("away_team") or "").lower().strip()
-            if (
-                h_full_target == h_name
-                or a_full_target == a_name
-                or (h_full_target and h_full_target.split()[-1] in h_name)
-                or (a_full_target and a_full_target.split()[-1] in a_name)
-            ):
+
+            h_mascot = h_full_target.split()[-1]
+            a_mascot = a_full_target.split()[-1]
+
+            # AMBOS equipos deben coincidir para no mezclar partidos diferentes
+            match_directo = (h_mascot in h_name) and (a_mascot in a_name)
+            match_cruzado = (h_mascot in a_name) and (a_mascot in h_name)
+            if match_directo or match_cruzado:
                 ev_id = eid
                 break
 
@@ -252,7 +254,11 @@ def _procesar_libro_evento(
 
         # 3. Obtener estadísticas reales de temporada del jugador desde ESPN (independientes de las casas)
         perfil = ctx.active_players.get(p_norm)
-        if perfil and perfil.has_real_stats:
+        if not perfil:
+            # El jugador no pertenece a la rotación de ninguno de los dos equipos de este partido: omitir
+            continue
+
+        if perfil.has_real_stats:
             es_titular = perfil.is_starter
             base_min = perfil.avg_minutes
             pos_jug = perfil.position
@@ -263,14 +269,14 @@ def _procesar_libro_evento(
             else:
                 tasa_min_real = perfil.ast_per_min
         else:
-            es_titular = perfil.is_starter if perfil else True
-            base_min = perfil.avg_minutes if perfil else 31.5
-            pos_jug = perfil.position if perfil else "G"
+            es_titular = perfil.is_starter
+            base_min = perfil.avg_minutes
+            pos_jug = perfil.position
             sharp_p_over, _ = quitar_margen_casa(sharp_ov, sharp_un)
             sharp_lambda_base = calcular_lambda_implicita_sharp(sharp_p_over, sharp_line, m_key)
             tasa_min_real = sharp_lambda_base / max(15.0, base_min)
 
-        equipo_jug = perfil.team_abbr if perfil else ctx.home_team
+        equipo_jug = perfil.team_abbr
         rival_jug = ctx.away_team if equipo_jug == ctx.home_team else ctx.home_team
         spread_equipo = ctx.home_spread if equipo_jug == ctx.home_team else -ctx.home_spread
 

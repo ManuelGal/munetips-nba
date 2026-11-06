@@ -128,13 +128,21 @@ def _extraer_tope_minutos_de_texto(texto: str) -> Optional[float]:
     if not texto:
         return None
     t_low = texto.lower()
-    if not any(k in t_low for k in ("minute", "restriction", "limit", "cap")):
+    if not any(k in t_low for k in ("restriction", "limit", "cap", "restricted")):
         return None
-    m = re.search(r"(\d{2})\s*(?:-|\s*to\s*)?\s*(\d{2})?\s*minutes", t_low)
-    if m:
-        val = _safe_float(m.group(2) or m.group(1), 0.0)
-        if 14.0 <= val <= 32.0:
-            return val
+    # Solo buscar frases explícitas de restricción médica, e.g.:
+    # "on a 24-minute restriction", "minute limit of 20", "capped at 25 minutes"
+    # NUNCA coincidir con oraciones que solo relatan minutos de partidos anteriores ("played 26 minutes")
+    patrones = [
+        r"(?:restriction|limit|capped|restricted)\s+(?:of|to|around|at)?\s*(\d{2})\s*(?:-\s*(\d{2}))?\s*min",
+        r"(\d{2})\s*(?:-\s*(\d{2}))?\s*minute\s*(?:restriction|limit|cap)",
+    ]
+    for pat in patrones:
+        m = re.search(pat, t_low)
+        if m:
+            val = _safe_float(m.group(2) or m.group(1), 0.0)
+            if 14.0 <= val <= 32.0:
+                return val
     return None
 
 
@@ -414,11 +422,12 @@ def obtener_contexto_partidos_hoy() -> list[NBAGameContext]:
             perfiles = obtener_roster_y_bajas_equipo(t_id, t_abbr, cache_stats)
             for p in perfiles:
                 clave_norm = normalizar_nombre(p.player_name)
-                prev_status = cache_previa.get(clave_norm, p.injury_status if primer_escaneo else "ACTIVE")
+                prev_status = cache_previa.get(clave_norm)
                 nuevo_estado_lesiones[clave_norm] = p.injury_status
 
                 if p.injury_status in ("OUT", "DOUBTFUL") and p.avg_minutes >= 20.0:
-                    if not primer_escaneo and prev_status not in ("OUT", "DOUBTFUL"):
+                    # Solo es "RECIÉN DESCARTADO" si estaba en caché previa Y su estado previo era ACTIVE o QUESTIONABLE
+                    if prev_status and prev_status in ("ACTIVE", "QUESTIONABLE"):
                         p.is_newly_out = True
                         p.injury_detail = f"RECIÉN DESCARTADO ({p.injury_status}) — " + p.injury_detail
                     newly_out_starters.append(p)
