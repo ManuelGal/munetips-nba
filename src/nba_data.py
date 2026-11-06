@@ -113,7 +113,12 @@ def _cargar_cache_stats() -> dict[str, dict]:
         return {}
     try:
         with open(config.PLAYER_STATS_CACHE_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
+            data = json.load(f)
+            # Sanitizar minutos_cap heredados de la regex antigua para evitar falsos topes
+            for v in data.values():
+                if isinstance(v, dict):
+                    v["minutes_cap"] = None
+            return data
     except Exception:
         return {}
 
