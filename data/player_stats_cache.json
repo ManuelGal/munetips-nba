@@ -1,51 +1,51 @@
 {
   "3136193": {
-    "date": "2026-11-06",
-    "avg_minutes": 34.7,
-    "pts_per_min": 0.7118,
-    "reb_per_min": 0.0922,
-    "ast_per_min": 0.1354,
+    "date": "2026-11-07",
+    "avg_minutes": 34.4,
+    "pts_per_min": 0.7384,
+    "reb_per_min": 0.0843,
+    "ast_per_min": 0.1483,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "4066383": {
-    "date": "2026-11-06",
-    "avg_minutes": 32.7,
-    "pts_per_min": 0.5291,
-    "reb_per_min": 0.2141,
-    "ast_per_min": 0.0856,
+    "date": "2026-11-07",
+    "avg_minutes": 32.4,
+    "pts_per_min": 0.537,
+    "reb_per_min": 0.2438,
+    "ast_per_min": 0.0957,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "3155526": {
-    "date": "2026-11-06",
-    "avg_minutes": 30.5,
-    "pts_per_min": 0.541,
-    "reb_per_min": 0.141,
-    "ast_per_min": 0.0984,
+    "date": "2026-11-07",
+    "avg_minutes": 30.3,
+    "pts_per_min": 0.5809,
+    "reb_per_min": 0.1287,
+    "ast_per_min": 0.0891,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "4888725": {
-    "date": "2026-11-06",
-    "avg_minutes": 13.3,
-    "pts_per_min": 0.3233,
-    "reb_per_min": 0.2782,
-    "ast_per_min": 0.0602,
+    "date": "2026-11-07",
+    "avg_minutes": 15.0,
+    "pts_per_min": 0.3533,
+    "reb_per_min": 0.24,
+    "ast_per_min": 0.0733,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "4278585": {
-    "date": "2026-11-06",
-    "avg_minutes": 25.5,
-    "pts_per_min": 0.2667,
-    "reb_per_min": 0.0863,
-    "ast_per_min": 0.1765,
+    "date": "2026-11-07",
+    "avg_minutes": 25.3,
+    "pts_per_min": 0.2648,
+    "reb_per_min": 0.083,
+    "ast_per_min": 0.1621,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "4278402": {
-    "date": "2026-11-06",
+    "date": "2026-11-07",
     "avg_minutes": 18.6,
     "pts_per_min": 0.4194,
     "reb_per_min": 0.1828,
@@ -54,43 +54,43 @@
     "has_real_stats": true
   },
   "4437244": {
-    "date": "2026-11-06",
-    "avg_minutes": 29.0,
-    "pts_per_min": 0.4414,
-    "reb_per_min": 0.1138,
-    "ast_per_min": 0.1138,
+    "date": "2026-11-07",
+    "avg_minutes": 28.3,
+    "pts_per_min": 0.4205,
+    "reb_per_min": 0.1025,
+    "ast_per_min": 0.1166,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "4601023": {
-    "date": "2026-11-06",
-    "avg_minutes": 20.8,
-    "pts_per_min": 0.399,
-    "reb_per_min": 0.2548,
-    "ast_per_min": 0.2067,
+    "date": "2026-11-07",
+    "avg_minutes": 21.4,
+    "pts_per_min": 0.3271,
+    "reb_per_min": 0.243,
+    "ast_per_min": 0.1682,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "3913174": {
-    "date": "2026-11-06",
-    "avg_minutes": 15.8,
-    "pts_per_min": 0.443,
-    "reb_per_min": 0.1013,
-    "ast_per_min": 0.0886,
+    "date": "2026-11-07",
+    "avg_minutes": 16.7,
+    "pts_per_min": 0.4671,
+    "reb_per_min": 0.0898,
+    "ast_per_min": 0.1198,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "5203685": {
-    "date": "2026-11-06",
-    "avg_minutes": 19.3,
-    "pts_per_min": 0.3731,
-    "reb_per_min": 0.3109,
-    "ast_per_min": 0.0622,
+    "date": "2026-11-07",
+    "avg_minutes": 19.7,
+    "pts_per_min": 0.3706,
+    "reb_per_min": 0.3046,
+    "ast_per_min": 0.066,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "4431695": {
-    "date": "2026-11-06",
+    "date": "2026-11-07",
     "avg_minutes": 8.7,
     "pts_per_min": 0.3908,
     "reb_per_min": 0.1379,
@@ -99,7 +99,7 @@
     "has_real_stats": true
   },
   "4701232": {
-    "date": "2026-11-06",
+    "date": "2026-11-07",
     "avg_minutes": 23.6,
     "pts_per_min": 0.4958,
     "reb_per_min": 0.339,
@@ -108,7 +108,7 @@
     "has_real_stats": true
   },
   "4432573": {
-    "date": "2026-11-06",
+    "date": "2026-11-07",
     "avg_minutes": 34.0,
     "pts_per_min": 0.7206,
     "reb_per_min": 0.1912,
@@ -117,70 +117,70 @@
     "has_real_stats": true
   },
   "4066320": {
-    "date": "2026-11-06",
-    "avg_minutes": 34.7,
-    "pts_per_min": 0.5159,
-    "reb_per_min": 0.1037,
-    "ast_per_min": 0.0749,
+    "date": "2026-11-07",
+    "avg_minutes": 34.5,
+    "pts_per_min": 0.5072,
+    "reb_per_min": 0.113,
+    "ast_per_min": 0.0667,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "4348700": {
-    "date": "2026-11-06",
-    "avg_minutes": 9.4,
-    "pts_per_min": 0.383,
-    "reb_per_min": 0.2979,
-    "ast_per_min": 0.0426,
+    "date": "2026-11-07",
+    "avg_minutes": 9.2,
+    "pts_per_min": 0.4022,
+    "reb_per_min": 0.3478,
+    "ast_per_min": 0.0326,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "4712849": {
-    "date": "2026-11-06",
-    "avg_minutes": 28.0,
-    "pts_per_min": 0.5893,
-    "reb_per_min": 0.1714,
-    "ast_per_min": 0.1714,
+    "date": "2026-11-07",
+    "avg_minutes": 28.6,
+    "pts_per_min": 0.5315,
+    "reb_per_min": 0.1818,
+    "ast_per_min": 0.1748,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "4278572": {
-    "date": "2026-11-06",
-    "avg_minutes": 16.4,
-    "pts_per_min": 0.3659,
-    "reb_per_min": 0.0976,
-    "ast_per_min": 0.0183,
+    "date": "2026-11-07",
+    "avg_minutes": 17.5,
+    "pts_per_min": 0.3371,
+    "reb_per_min": 0.1143,
+    "ast_per_min": 0.0171,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "3133635": {
-    "date": "2026-11-06",
-    "avg_minutes": 17.7,
-    "pts_per_min": 0.209,
-    "reb_per_min": 0.0395,
-    "ast_per_min": 0.1525,
+    "date": "2026-11-07",
+    "avg_minutes": 14.0,
+    "pts_per_min": 0.2,
+    "reb_per_min": 0.0357,
+    "ast_per_min": 0.1429,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "4277847": {
-    "date": "2026-11-06",
-    "avg_minutes": 32.4,
-    "pts_per_min": 0.3827,
-    "reb_per_min": 0.2747,
-    "ast_per_min": 0.0309,
+    "date": "2026-11-07",
+    "avg_minutes": 32.8,
+    "pts_per_min": 0.436,
+    "reb_per_min": 0.2866,
+    "ast_per_min": 0.0335,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "4702382": {
-    "date": "2026-11-06",
-    "avg_minutes": 29.4,
-    "pts_per_min": 0.4796,
-    "reb_per_min": 0.1156,
-    "ast_per_min": 0.0578,
+    "date": "2026-11-07",
+    "avg_minutes": 29.5,
+    "pts_per_min": 0.4949,
+    "reb_per_min": 0.1119,
+    "ast_per_min": 0.0542,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "4065654": {
-    "date": "2026-11-06",
+    "date": "2026-11-07",
     "avg_minutes": 10.0,
     "pts_per_min": 0.26,
     "reb_per_min": 0.25,
@@ -198,7 +198,7 @@
     "has_real_stats": true
   },
   "5214637": {
-    "date": "2026-11-06",
+    "date": "2026-11-07",
     "avg_minutes": 12.8,
     "pts_per_min": 0.2969,
     "reb_per_min": 0.25,
@@ -207,16 +207,16 @@
     "has_real_stats": true
   },
   "5239561": {
-    "date": "2026-11-06",
-    "avg_minutes": 21.1,
-    "pts_per_min": 0.2796,
-    "reb_per_min": 0.09,
-    "ast_per_min": 0.1137,
+    "date": "2026-11-07",
+    "avg_minutes": 21.9,
+    "pts_per_min": 0.2922,
+    "reb_per_min": 0.0868,
+    "ast_per_min": 0.1142,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "4432165": {
-    "date": "2026-11-06",
+    "date": "2026-11-07",
     "avg_minutes": 33.3,
     "pts_per_min": 0.2402,
     "reb_per_min": 0.1502,
@@ -225,34 +225,34 @@
     "has_real_stats": true
   },
   "6478": {
-    "date": "2026-11-06",
-    "avg_minutes": 9.6,
-    "pts_per_min": 0.3229,
-    "reb_per_min": 0.3125,
-    "ast_per_min": 0.1354,
+    "date": "2026-11-07",
+    "avg_minutes": 8.9,
+    "pts_per_min": 0.3146,
+    "reb_per_min": 0.2921,
+    "ast_per_min": 0.1236,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "4566434": {
-    "date": "2026-11-06",
-    "avg_minutes": 35.9,
-    "pts_per_min": 0.5655,
-    "reb_per_min": 0.1699,
-    "ast_per_min": 0.2117,
+    "date": "2026-11-07",
+    "avg_minutes": 36.0,
+    "pts_per_min": 0.5444,
+    "reb_per_min": 0.1778,
+    "ast_per_min": 0.2361,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "4397886": {
-    "date": "2026-11-06",
-    "avg_minutes": 11.3,
-    "pts_per_min": 0.6018,
-    "reb_per_min": 0.4425,
-    "ast_per_min": 0.0619,
+    "date": "2026-11-07",
+    "avg_minutes": 11.9,
+    "pts_per_min": 0.5882,
+    "reb_per_min": 0.4454,
+    "ast_per_min": 0.0504,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "6430": {
-    "date": "2026-11-06",
+    "date": "2026-11-07",
     "avg_minutes": 31.1,
     "pts_per_min": 0.6431,
     "reb_per_min": 0.1801,
@@ -261,61 +261,61 @@
     "has_real_stats": true
   },
   "3975": {
-    "date": "2026-11-06",
-    "avg_minutes": 28.8,
-    "pts_per_min": 1.0417,
-    "reb_per_min": 0.1458,
-    "ast_per_min": 0.1562,
+    "date": "2026-11-07",
+    "avg_minutes": 28.7,
+    "pts_per_min": 1.0418,
+    "reb_per_min": 0.1289,
+    "ast_per_min": 0.1533,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "6589": {
-    "date": "2026-11-06",
-    "avg_minutes": 26.5,
-    "pts_per_min": 0.1208,
-    "reb_per_min": 0.1887,
-    "ast_per_min": 0.2377,
+    "date": "2026-11-07",
+    "avg_minutes": 26.7,
+    "pts_per_min": 0.1124,
+    "reb_per_min": 0.1873,
+    "ast_per_min": 0.2622,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "3213": {
-    "date": "2026-11-06",
-    "avg_minutes": 18.7,
-    "pts_per_min": 0.2674,
-    "reb_per_min": 0.2139,
-    "ast_per_min": 0.0535,
+    "date": "2026-11-07",
+    "avg_minutes": 18.6,
+    "pts_per_min": 0.2903,
+    "reb_per_min": 0.2204,
+    "ast_per_min": 0.0538,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "4703396": {
-    "date": "2026-11-06",
-    "avg_minutes": 11.2,
-    "pts_per_min": 0.5179,
-    "reb_per_min": 0.2411,
-    "ast_per_min": 0.0714,
+    "date": "2026-11-07",
+    "avg_minutes": 9.7,
+    "pts_per_min": 0.5155,
+    "reb_per_min": 0.2474,
+    "ast_per_min": 0.0722,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "5175737": {
-    "date": "2026-11-06",
-    "avg_minutes": 31.9,
-    "pts_per_min": 0.674,
-    "reb_per_min": 0.2194,
-    "ast_per_min": 0.1223,
+    "date": "2026-11-07",
+    "avg_minutes": 31.8,
+    "pts_per_min": 0.6604,
+    "reb_per_min": 0.2233,
+    "ast_per_min": 0.1289,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "4066436": {
-    "date": "2026-11-06",
-    "avg_minutes": 23.0,
-    "pts_per_min": 0.4609,
-    "reb_per_min": 0.1957,
-    "ast_per_min": 0.1,
+    "date": "2026-11-07",
+    "avg_minutes": 22.3,
+    "pts_per_min": 0.4484,
+    "reb_per_min": 0.2108,
+    "ast_per_min": 0.0987,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "4432171": {
-    "date": "2026-11-06",
+    "date": "2026-11-07",
     "avg_minutes": 25.7,
     "pts_per_min": 0.4708,
     "reb_per_min": 0.1284,
@@ -324,34 +324,34 @@
     "has_real_stats": true
   },
   "2990969": {
-    "date": "2026-11-06",
-    "avg_minutes": 19.9,
-    "pts_per_min": 0.3668,
-    "reb_per_min": 0.1508,
-    "ast_per_min": 0.0754,
+    "date": "2026-11-07",
+    "avg_minutes": 20.1,
+    "pts_per_min": 0.393,
+    "reb_per_min": 0.1542,
+    "ast_per_min": 0.0846,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "3134903": {
-    "date": "2026-11-06",
-    "avg_minutes": 13.9,
-    "pts_per_min": 0.3309,
-    "reb_per_min": 0.1439,
-    "ast_per_min": 0.036,
+    "date": "2026-11-07",
+    "avg_minutes": 13.4,
+    "pts_per_min": 0.3806,
+    "reb_per_min": 0.1343,
+    "ast_per_min": 0.0299,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "4709138": {
-    "date": "2026-11-06",
-    "avg_minutes": 33.5,
-    "pts_per_min": 0.5075,
-    "reb_per_min": 0.1493,
-    "ast_per_min": 0.1493,
+    "date": "2026-11-07",
+    "avg_minutes": 33.3,
+    "pts_per_min": 0.4775,
+    "reb_per_min": 0.1532,
+    "ast_per_min": 0.1411,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "3102531": {
-    "date": "2026-11-06",
+    "date": "2026-11-07",
     "avg_minutes": 24.0,
     "pts_per_min": 0.6958,
     "reb_per_min": 0.2167,
@@ -360,16 +360,16 @@
     "has_real_stats": true
   },
   "4897262": {
-    "date": "2026-11-06",
-    "avg_minutes": 18.0,
-    "pts_per_min": 0.2556,
-    "reb_per_min": 0.1111,
-    "ast_per_min": 0.05,
+    "date": "2026-11-07",
+    "avg_minutes": 17.8,
+    "pts_per_min": 0.2921,
+    "reb_per_min": 0.1011,
+    "ast_per_min": 0.0562,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "4997536": {
-    "date": "2026-11-06",
+    "date": "2026-11-07",
     "avg_minutes": 20.2,
     "pts_per_min": 0.3564,
     "reb_per_min": 0.198,
@@ -378,11 +378,11 @@
     "has_real_stats": true
   },
   "4397040": {
-    "date": "2026-11-06",
-    "avg_minutes": 17.3,
-    "pts_per_min": 0.6705,
-    "reb_per_min": 0.1676,
-    "ast_per_min": 0.1387,
+    "date": "2026-11-07",
+    "avg_minutes": 17.8,
+    "pts_per_min": 0.6404,
+    "reb_per_min": 0.1461,
+    "ast_per_min": 0.1461,
     "minutes_cap": null,
     "has_real_stats": true
   },
@@ -2597,6 +2597,627 @@
     "pts_per_min": 0.9177,
     "reb_per_min": 0.3924,
     "ast_per_min": 0.0981,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "4431752": {
+    "date": "2026-11-07",
+    "avg_minutes": 13.7,
+    "pts_per_min": 0.3431,
+    "reb_per_min": 0.1679,
+    "ast_per_min": 0.073,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "5157066": {
+    "date": "2026-11-07",
+    "avg_minutes": 18.4,
+    "pts_per_min": 0.2772,
+    "reb_per_min": 0.2391,
+    "ast_per_min": 0.0652,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "4396993": {
+    "date": "2026-11-07",
+    "avg_minutes": 33.0,
+    "pts_per_min": 0.6606,
+    "reb_per_min": 0.1364,
+    "ast_per_min": 0.2879,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "4065731": {
+    "date": "2026-11-07",
+    "avg_minutes": 19.3,
+    "pts_per_min": 0.4145,
+    "reb_per_min": 0.2021,
+    "ast_per_min": 0.057,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "4592829": {
+    "date": "2026-11-07",
+    "avg_minutes": 21.8,
+    "pts_per_min": 0.4771,
+    "reb_per_min": 0.156,
+    "ast_per_min": 0.1239,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "2530530": {
+    "date": "2026-11-07",
+    "avg_minutes": 17.2,
+    "pts_per_min": 0.5465,
+    "reb_per_min": 0.1279,
+    "ast_per_min": 0.2965,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "2580365": {
+    "date": "2026-11-07",
+    "avg_minutes": 16.0,
+    "pts_per_min": 0.2125,
+    "reb_per_min": 0.2062,
+    "ast_per_min": 0.0375,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "4395712": {
+    "date": "2026-11-07",
+    "avg_minutes": 33.4,
+    "pts_per_min": 0.5689,
+    "reb_per_min": 0.0629,
+    "ast_per_min": 0.2066,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "4396909": {
+    "date": "2026-11-07",
+    "avg_minutes": 24.1,
+    "pts_per_min": 0.527,
+    "reb_per_min": 0.083,
+    "ast_per_min": 0.0788,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "3133603": {
+    "date": "2026-11-07",
+    "avg_minutes": 23.1,
+    "pts_per_min": 0.4069,
+    "reb_per_min": 0.1126,
+    "ast_per_min": 0.0693,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "4433076": {
+    "date": "2026-11-07",
+    "avg_minutes": 12.0,
+    "pts_per_min": 0.25,
+    "reb_per_min": 0.0833,
+    "ast_per_min": 0.0,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "3149673": {
+    "date": "2026-11-07",
+    "avg_minutes": 31.9,
+    "pts_per_min": 0.6677,
+    "reb_per_min": 0.2226,
+    "ast_per_min": 0.1191,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "4398207": {
+    "date": "2026-11-07",
+    "avg_minutes": 15.3,
+    "pts_per_min": 0.2484,
+    "reb_per_min": 0.2222,
+    "ast_per_min": 0.0654,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "5105854": {
+    "date": "2026-11-07",
+    "avg_minutes": 14.0,
+    "pts_per_min": 0.3571,
+    "reb_per_min": 0.0571,
+    "ast_per_min": 0.2,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "4278355": {
+    "date": "2026-11-07",
+    "avg_minutes": 22.2,
+    "pts_per_min": 0.6532,
+    "reb_per_min": 0.2342,
+    "ast_per_min": 0.0541,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "5106060": {
+    "date": "2026-11-07",
+    "avg_minutes": 23.8,
+    "pts_per_min": 0.3025,
+    "reb_per_min": 0.2647,
+    "ast_per_min": 0.084,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "4017837": {
+    "date": "2026-11-07",
+    "avg_minutes": 20.8,
+    "pts_per_min": 0.3365,
+    "reb_per_min": 0.375,
+    "ast_per_min": 0.0721,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "4277848": {
+    "date": "2026-11-07",
+    "avg_minutes": 12.4,
+    "pts_per_min": 0.4355,
+    "reb_per_min": 0.2903,
+    "ast_per_min": 0.0565,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "4431767": {
+    "date": "2026-11-07",
+    "avg_minutes": 35.1,
+    "pts_per_min": 0.416,
+    "reb_per_min": 0.1111,
+    "ast_per_min": 0.0655,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "4698719": {
+    "date": "2026-11-07",
+    "avg_minutes": 22.1,
+    "pts_per_min": 0.362,
+    "reb_per_min": 0.2896,
+    "ast_per_min": 0.0181,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "3978": {
+    "date": "2026-11-07",
+    "avg_minutes": 25.0,
+    "pts_per_min": 0.428,
+    "reb_per_min": 0.08,
+    "ast_per_min": 0.108,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "4065813": {
+    "date": "2026-11-07",
+    "avg_minutes": 10.7,
+    "pts_per_min": 0.1215,
+    "reb_per_min": 0.0935,
+    "ast_per_min": 0.0654,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "3064290": {
+    "date": "2026-11-07",
+    "avg_minutes": 29.6,
+    "pts_per_min": 0.4155,
+    "reb_per_min": 0.1791,
+    "ast_per_min": 0.0811,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "4565698": {
+    "date": "2026-11-07",
+    "avg_minutes": 18.6,
+    "pts_per_min": 0.3548,
+    "reb_per_min": 0.1398,
+    "ast_per_min": 0.0323,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "3138196": {
+    "date": "2026-11-07",
+    "avg_minutes": 27.0,
+    "pts_per_min": 0.3333,
+    "reb_per_min": 0.1593,
+    "ast_per_min": 0.0741,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "3112335": {
+    "date": "2026-11-07",
+    "avg_minutes": 36.0,
+    "pts_per_min": 0.65,
+    "reb_per_min": 0.2694,
+    "ast_per_min": 0.2583,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "4592427": {
+    "date": "2026-11-07",
+    "avg_minutes": 22.1,
+    "pts_per_min": 0.2489,
+    "reb_per_min": 0.1493,
+    "ast_per_min": 0.0362,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "3135046": {
+    "date": "2026-11-07",
+    "avg_minutes": 10.9,
+    "pts_per_min": 0.2661,
+    "reb_per_min": 0.0092,
+    "ast_per_min": 0.156,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "3936299": {
+    "date": "2026-11-07",
+    "avg_minutes": 37.0,
+    "pts_per_min": 0.6865,
+    "reb_per_min": 0.1459,
+    "ast_per_min": 0.1595,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "4432181": {
+    "date": "2026-11-07",
+    "avg_minutes": 15.1,
+    "pts_per_min": 0.4768,
+    "reb_per_min": 0.1325,
+    "ast_per_min": 0.0728,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "5101761": {
+    "date": "2026-11-07",
+    "avg_minutes": 22.8,
+    "pts_per_min": 0.5263,
+    "reb_per_min": 0.1009,
+    "ast_per_min": 0.1754,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "4712896": {
+    "date": "2026-11-07",
+    "avg_minutes": 21.0,
+    "pts_per_min": 0.2667,
+    "reb_per_min": 0.2095,
+    "ast_per_min": 0.0429,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "5175643": {
+    "date": "2026-11-07",
+    "avg_minutes": 21.8,
+    "pts_per_min": 0.3578,
+    "reb_per_min": 0.1055,
+    "ast_per_min": 0.1284,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "4702177": {
+    "date": "2026-11-07",
+    "avg_minutes": 22.6,
+    "pts_per_min": 0.1991,
+    "reb_per_min": 0.0796,
+    "ast_per_min": 0.0796,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "5174655": {
+    "date": "2026-11-07",
+    "avg_minutes": 21.1,
+    "pts_per_min": 0.2417,
+    "reb_per_min": 0.1374,
+    "ast_per_min": 0.0474,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "3907823": {
+    "date": "2026-11-07",
+    "avg_minutes": 14.3,
+    "pts_per_min": 0.049,
+    "reb_per_min": 0.0699,
+    "ast_per_min": 0.1189,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "4702670": {
+    "date": "2026-11-07",
+    "avg_minutes": 8.8,
+    "pts_per_min": 0.4886,
+    "reb_per_min": 0.1705,
+    "ast_per_min": 0.1477,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "4278104": {
+    "date": "2026-11-07",
+    "avg_minutes": 33.3,
+    "pts_per_min": 0.6426,
+    "reb_per_min": 0.2222,
+    "ast_per_min": 0.039,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "5037873": {
+    "date": "2026-11-07",
+    "avg_minutes": 9.0,
+    "pts_per_min": 0.0,
+    "reb_per_min": 0.1111,
+    "ast_per_min": 0.2778,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "3064514": {
+    "date": "2026-11-07",
+    "avg_minutes": 33.9,
+    "pts_per_min": 0.6195,
+    "reb_per_min": 0.2094,
+    "ast_per_min": 0.1416,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "4432194": {
+    "date": "2026-11-07",
+    "avg_minutes": 23.1,
+    "pts_per_min": 0.3074,
+    "reb_per_min": 0.3074,
+    "ast_per_min": 0.1126,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "5279130": {
+    "date": "2026-11-07",
+    "avg_minutes": 22.1,
+    "pts_per_min": 0.543,
+    "reb_per_min": 0.1041,
+    "ast_per_min": 0.1267,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "3150844": {
+    "date": "2026-11-07",
+    "avg_minutes": 18.9,
+    "pts_per_min": 0.5503,
+    "reb_per_min": 0.1799,
+    "ast_per_min": 0.0582,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "5107173": {
+    "date": "2026-11-07",
+    "avg_minutes": 15.3,
+    "pts_per_min": 0.6078,
+    "reb_per_min": 0.281,
+    "ast_per_min": 0.1307,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "4277869": {
+    "date": "2026-11-07",
+    "avg_minutes": 11.3,
+    "pts_per_min": 0.2212,
+    "reb_per_min": 0.115,
+    "ast_per_min": 0.1593,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "3934719": {
+    "date": "2026-11-07",
+    "avg_minutes": 32.9,
+    "pts_per_min": 0.5046,
+    "reb_per_min": 0.1672,
+    "ast_per_min": 0.076,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "3147657": {
+    "date": "2026-11-07",
+    "avg_minutes": 25.3,
+    "pts_per_min": 0.249,
+    "reb_per_min": 0.1146,
+    "ast_per_min": 0.0791,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "3934672": {
+    "date": "2026-11-07",
+    "avg_minutes": 34.1,
+    "pts_per_min": 0.7507,
+    "reb_per_min": 0.0762,
+    "ast_per_min": 0.1496,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "2528426": {
+    "date": "2026-11-07",
+    "avg_minutes": 9.9,
+    "pts_per_min": 0.6162,
+    "reb_per_min": 0.1414,
+    "ast_per_min": 0.0404,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "5289900": {
+    "date": "2026-11-07",
+    "avg_minutes": 9.7,
+    "pts_per_min": 0.2784,
+    "reb_per_min": 0.2371,
+    "ast_per_min": 0.134,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "6585": {
+    "date": "2026-11-07",
+    "avg_minutes": 13.3,
+    "pts_per_min": 0.4211,
+    "reb_per_min": 0.5865,
+    "ast_per_min": 0.0827,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "3062679": {
+    "date": "2026-11-07",
+    "avg_minutes": 31.7,
+    "pts_per_min": 0.2713,
+    "reb_per_min": 0.2303,
+    "ast_per_min": 0.123,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "4897943": {
+    "date": "2026-11-07",
+    "avg_minutes": 16.0,
+    "pts_per_min": 0.625,
+    "reb_per_min": 0.4375,
+    "ast_per_min": 0.0625,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "4433225": {
+    "date": "2026-11-07",
+    "avg_minutes": 12.2,
+    "pts_per_min": 0.2049,
+    "reb_per_min": 0.1066,
+    "ast_per_min": 0.4262,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "4431823": {
+    "date": "2026-11-07",
+    "avg_minutes": 17.5,
+    "pts_per_min": 0.3943,
+    "reb_per_min": 0.1086,
+    "ast_per_min": 0.0571,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "3914044": {
+    "date": "2026-11-07",
+    "avg_minutes": 24.9,
+    "pts_per_min": 0.3775,
+    "reb_per_min": 0.0602,
+    "ast_per_min": 0.0803,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "3136195": {
+    "date": "2026-11-07",
+    "avg_minutes": 31.3,
+    "pts_per_min": 0.6358,
+    "reb_per_min": 0.4345,
+    "ast_per_min": 0.099,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "2991235": {
+    "date": "2026-11-07",
+    "avg_minutes": 8.0,
+    "pts_per_min": 0.5,
+    "reb_per_min": 0.25,
+    "ast_per_min": 0.125,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "3037789": {
+    "date": "2026-11-07",
+    "avg_minutes": 12.2,
+    "pts_per_min": 0.459,
+    "reb_per_min": 0.0902,
+    "ast_per_min": 0.0902,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "3102529": {
+    "date": "2026-11-07",
+    "avg_minutes": 14.2,
+    "pts_per_min": 0.2254,
+    "reb_per_min": 0.3662,
+    "ast_per_min": 0.1197,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "3202": {
+    "date": "2026-11-07",
+    "avg_minutes": 33.7,
+    "pts_per_min": 0.6172,
+    "reb_per_min": 0.1543,
+    "ast_per_min": 0.089,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "4433192": {
+    "date": "2026-11-07",
+    "avg_minutes": 24.4,
+    "pts_per_min": 0.418,
+    "reb_per_min": 0.2459,
+    "ast_per_min": 0.0492,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "5105553": {
+    "date": "2026-11-07",
+    "avg_minutes": 8.9,
+    "pts_per_min": 0.3258,
+    "reb_per_min": 0.1124,
+    "ast_per_min": 0.0225,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "4871144": {
+    "date": "2026-11-07",
+    "avg_minutes": 35.1,
+    "pts_per_min": 0.6382,
+    "reb_per_min": 0.2593,
+    "ast_per_min": 0.2308,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "4711272": {
+    "date": "2026-11-07",
+    "avg_minutes": 21.7,
+    "pts_per_min": 0.4931,
+    "reb_per_min": 0.106,
+    "ast_per_min": 0.1705,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "2990992": {
+    "date": "2026-11-07",
+    "avg_minutes": 23.0,
+    "pts_per_min": 0.4261,
+    "reb_per_min": 0.1217,
+    "ast_per_min": 0.1087,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "4432639": {
+    "date": "2026-11-07",
+    "avg_minutes": 34.7,
+    "pts_per_min": 0.5072,
+    "reb_per_min": 0.1758,
+    "ast_per_min": 0.0663,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "4684740": {
+    "date": "2026-11-07",
+    "avg_minutes": 32.7,
+    "pts_per_min": 0.4709,
+    "reb_per_min": 0.1927,
+    "ast_per_min": 0.1009,
+    "minutes_cap": null,
+    "has_real_stats": true
+  },
+  "2991230": {
+    "date": "2026-11-07",
+    "avg_minutes": 30.0,
+    "pts_per_min": 0.4333,
+    "reb_per_min": 0.1133,
+    "ast_per_min": 0.21,
     "minutes_cap": null,
     "has_real_stats": true
   }
