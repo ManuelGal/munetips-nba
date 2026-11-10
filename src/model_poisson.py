@@ -397,8 +397,10 @@ def ajustar_prob_sharp_por_diferencia_de_linea(
 
 
 def aplicar_asimetria_lesion_playdoit(
-    prob_over_sano: float,
-    prob_under_sano: float,
+    prob_over_sano: float = 0.5,
+    prob_under_sano: float = 0.5,
+    raw_prob_over: Optional[float] = None,
+    raw_prob_under: Optional[float] = None,
 ) -> tuple[float, float, float]:
     """
     Modela la regla contractual real de Playdoit.mx (Altenar) en pre-partido:
@@ -410,12 +412,15 @@ def aplicar_asimetria_lesion_playdoit(
       * El UNDER GANA (+1).
     Devuelve: (prob_win_over, prob_win_under, prob_void_over)
     """
+    p_ov = raw_prob_over if raw_prob_over is not None else prob_over_sano
+    p_un = raw_prob_under if raw_prob_under is not None else prob_under_sano
+
     p_void_1h = getattr(config, "PLAYDOIT_FIRST_HALF_VOID_PROB", 0.010)
     p_loss_2h = getattr(config, "PLAYDOIT_SECOND_HALF_LOSS_PROB", 0.008)
 
-    prob_win_over = prob_over_sano * (1.0 - p_void_1h - p_loss_2h)
-    prob_void_over = prob_over_sano * p_void_1h
-    prob_win_under = prob_under_sano + (prob_over_sano * (p_void_1h + p_loss_2h))
+    prob_win_over = p_ov * (1.0 - p_void_1h - p_loss_2h)
+    prob_void_over = p_ov * p_void_1h
+    prob_win_under = p_un + (p_ov * (p_void_1h + p_loss_2h))
 
     return (
         min(0.99, max(0.01, prob_win_over)),

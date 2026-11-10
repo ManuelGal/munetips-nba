@@ -83,8 +83,8 @@ def test_suite_1_calibracion_score():
         ev_pct=0.150,
         win_prob=0.71,
         side="UNDER",
-        playdoit_line=21.5,
-        sharp_line=22.5,
+        playdoit_line=22.5,
+        sharp_line=21.5,
         has_injury_catalyst=True,
         game_spread=-4.5,
         is_starter=True,
@@ -126,7 +126,7 @@ def test_suite_2_reglas_playdoit():
     )
 
     # 2. Asimetría contractual de lesiones (Void 1H en Over / Win en Under)
-    p_ov_win, p_un_win, p_ov_void = aplicar_asimetria_lesion_playdoit(raw_prob_over=0.50, raw_prob_under=0.50)
+    p_ov_win, p_un_win, p_ov_void = aplicar_asimetria_lesion_playdoit(prob_over_sano=0.50, prob_under_sano=0.50)
     assert_test(
         f"OVER tiene probabilidad de anulación (Void) asignada (~1.0%, obtenido: {p_ov_void})",
         p_ov_void == 0.010,
