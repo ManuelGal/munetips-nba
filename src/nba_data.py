@@ -133,18 +133,23 @@ def _extraer_tope_minutos_de_texto(texto: str) -> Optional[float]:
     if not texto:
         return None
     t_low = texto.lower()
+    if "unrestricted" in t_low or "no restriction" in t_low or "no minute" in t_low or "without restriction" in t_low:
+        return None
     if not any(k in t_low for k in ("restriction", "limit", "cap", "restricted")):
         return None
-    # Solo buscar frases explícitas de restricción médica, e.g.:
+    # Solo buscar frases explícitas de restricción médica vigente, e.g.:
     # "on a 24-minute restriction", "minute limit of 20", "capped at 25 minutes"
-    # NUNCA coincidir con oraciones que solo relatan minutos de partidos anteriores ("played 26 minutes")
+    # NUNCA coincidir con oraciones pasadas ("was on a...") ni negaciones ("no 20-minute restriction")
     patrones = [
         r"(?:restriction|limit|capped|restricted)\s+(?:of|to|around|at)?\s*(\d{2})\s*(?:-\s*(\d{2}))?\s*min",
         r"(\d{2})\s*(?:-\s*(\d{2}))?\s*minute\s*(?:restriction|limit|cap)",
     ]
+    negaciones_previas = ("no ", "not ", "without ", "zero ", "lifted", "cleared", "was on ", "had a ")
     for pat in patrones:
-        m = re.search(pat, t_low)
-        if m:
+        for m in re.finditer(pat, t_low):
+            prefijo = t_low[max(0, m.start() - 30):m.start()]
+            if any(neg in prefijo for neg in negaciones_previas):
+                continue
             val = _safe_float(m.group(2) or m.group(1), 0.0)
             if 14.0 <= val <= 32.0:
                 return val
@@ -390,17 +395,6 @@ def obtener_contexto_partidos_hoy() -> list[NBAGameContext]:
             continue
         comp = comps[0]
 
-        home_spread = 0.0
-        odds_list = comp.get("odds", [])
-        if odds_list:
-            details = odds_list[0].get("details", "")
-            try:
-                partes = details.split()
-                if len(partes) == 2:
-                    home_spread = _safe_float(partes[1], 0.0)
-            except Exception:
-                home_spread = 0.0
-
         competitors = comp.get("competitors", [])
         if len(competitors) < 2:
             continue
@@ -409,12 +403,8 @@ def obtener_contexto_partidos_hoy() -> list[NBAGameContext]:
         away_team_abbr = ""
         home_team_full = ""
         away_team_full = ""
-        newly_out_starters: list[PlayerStatsProfile] = []
-        active_players: dict[str, PlayerStatsProfile] = {}
-
         for team_entry in competitors:
             team_obj = team_entry.get("team", {})
-            t_id = str(team_obj.get("id", ""))
             t_abbr = team_obj.get("abbreviation", "NBA")
             t_full = team_obj.get("displayName", t_abbr)
             if team_entry.get("homeAway") == "home":
@@ -423,6 +413,33 @@ def obtener_contexto_partidos_hoy() -> list[NBAGameContext]:
             else:
                 away_team_abbr = t_abbr
                 away_team_full = t_full
+
+        home_spread = 0.0
+        odds_list = comp.get("odds", [])
+        if odds_list:
+            details = (odds_list[0].get("details") or "").strip()
+            try:
+                partes = details.split()
+                if len(partes) == 2:
+                    fav_abbr = partes[0].upper().strip()
+                    val_spread = abs(_safe_float(partes[1], 0.0))
+                    # En ESPN details viene como "BOS -11.5" (el equipo nombrado es el favorito)
+                    if fav_abbr == away_team_abbr.upper().strip():
+                        # Si el favorito es el visitante, el local es underdog (+val_spread)
+                        home_spread = val_spread
+                    else:
+                        # Si el favorito es el local, el local tiene spread negativo (-val_spread)
+                        home_spread = -val_spread
+            except Exception:
+                home_spread = 0.0
+
+        newly_out_starters: list[PlayerStatsProfile] = []
+        active_players: dict[str, PlayerStatsProfile] = {}
+
+        for team_entry in competitors:
+            team_obj = team_entry.get("team", {})
+            t_id = str(team_obj.get("id", ""))
+            t_abbr = team_obj.get("abbreviation", "NBA")
 
             perfiles = obtener_roster_y_bajas_equipo(t_id, t_abbr, cache_stats)
             for p in perfiles:

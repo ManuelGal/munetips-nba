@@ -201,6 +201,11 @@ def calificar_historial(fecha_str: str = None):
                     res = "WIN"
                     profit = stake * (cuota - 1.0)
                     ganadas += 1
+                elif 0 < st["min"] <= 14.0:
+                    # Regla contractual Playdoit: si el jugador sale lesionado en 1ra mitad (<=14 min) sin cubrir el Over, es Reembolso (VOID)
+                    res = "VOID (Lesión 1H)"
+                    profit = 0.0
+                    voids += 1
                 elif stat_real < linea:
                     res = "LOSS"
                     profit = -stake

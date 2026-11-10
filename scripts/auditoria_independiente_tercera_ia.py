@@ -186,6 +186,15 @@ def test_suite_4_blindaje_lesiones_regex():
         f"Tope esperado 22.0, obtenido: {tope_real}"
     )
 
+    # Caso 3: Negación médica ("no 20-minute restriction" o "was on a...")
+    texto_negado = "Coach confirmed there is no 20-minute restriction tonight and he is unrestricted."
+    tope_negado = _extraer_tope_minutos_de_texto(texto_negado)
+    assert_test(
+        "Negación de restricción ('no 20-minute restriction') devuelve None",
+        tope_negado is None,
+        f"Se extrajo erróneamente: {tope_negado}"
+    )
+
 
 def test_suite_5_ordenamiento_alertas():
     print("\n--- SUITE 5: Verificación de Ordenamiento de Alertas en main.py ---")

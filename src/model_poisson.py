@@ -462,15 +462,17 @@ def calcular_score_1_a_10(
     Esto evita que picks de 60% se inflen artificialmente al techo (9.8), reservando
     las notas 9.3 a 9.9 exclusivamente para selecciones con alta probabilidad Y alto EV.
     """
-    # 1. Base por EV neto
+    # 1. Base por EV neto (Cero inflación si EV <= 0)
+    if ev_pct <= 0.0:
+        return 1.0
     if ev_pct < 0.040:
-        pts_ev = 4.0 + (ev_pct / 0.040) * 1.0        # 4.0 a 5.0
+        pts_ev = 1.0 + (ev_pct / 0.040) * 4.1        # 1.0 a 5.1
     elif ev_pct < 0.080:
-        pts_ev = 5.0 + ((ev_pct - 0.040) / 0.040) * 1.2  # 5.0 a 6.2
+        pts_ev = 5.1 + ((ev_pct - 0.040) / 0.040) * 1.2  # 5.1 a 6.3
     elif ev_pct < 0.140:
-        pts_ev = 6.2 + ((ev_pct - 0.080) / 0.060) * 1.0  # 6.2 a 7.2
+        pts_ev = 6.3 + ((ev_pct - 0.080) / 0.060) * 1.0  # 6.3 a 7.3
     else:
-        pts_ev = min(7.8, 7.2 + (ev_pct - 0.140) * 2.0)  # 7.2 a 7.8
+        pts_ev = min(7.8, 7.3 + (ev_pct - 0.140) * 2.0)  # 7.3 a 7.8
 
     # 2. Componente de Probabilidad de Acierto (Previa penalización / premio)
     # Por debajo de 54% no suma; de 58% a 65% da soporte sólido; >68% impulsa a élite
@@ -483,24 +485,17 @@ def calcular_score_1_a_10(
     else:
         pts_prob = min(1.6, 1.3 + ((win_prob - 0.68) / 0.10) * 0.3)  # 1.3 a 1.6
 
-    # 3. Ventaja de Línea sobre el Consenso Sharp
+    # 3. Ventaja de Línea continua sobre el Consenso Sharp (sin escalones artificiales)
     ventaja_puntos = (sharp_line - playdoit_line) if side == "OVER" else (playdoit_line - sharp_line)
-    if ventaja_puntos >= 1.5:
-        pts_linea = 0.5
-    elif ventaja_puntos >= 0.5:
-        pts_linea = 0.3
-    else:
-        pts_linea = 0.0
+    pts_linea = min(0.6, max(-0.6, ventaja_puntos * 0.4))
 
-    # 4. Catalizador Contextual
+    # 4. Catalizador Contextual (sin doble conteo del bono genérico de Under)
     pts_contexto = 0.0
     if has_injury_catalyst:
-        pts_contexto += 0.25
+        pts_contexto += 0.35
 
-    if side == "UNDER":
-        pts_contexto += 0.15  # Ventaja contractual de regla lesión/faltas en Playdoit
-        if is_starter and abs(game_spread) >= 9.5:
-            pts_contexto += 0.10  # Riesgo real de blowout
+    if side == "UNDER" and is_starter and abs(game_spread) >= 9.5:
+        pts_contexto += 0.15  # Riesgo real de blowout en 4to cuarto
 
     raw_score = pts_ev + pts_prob + pts_linea + pts_contexto
     return round(min(9.9, max(1.0, raw_score)), 1)

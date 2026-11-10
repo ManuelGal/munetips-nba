@@ -1,7 +1,9 @@
 """
 Módulo de Notificaciones Push a Telegram para el canal 'Muñetips'.
 Formato minimalista y directo de 7 líneas para lectura rápida en el celular.
+Utiliza parse_mode='HTML' con escape de entidades para evitar fallos por guiones bajos o asteriscos.
 """
+import html
 import json
 import urllib.request
 from typing import Optional
@@ -13,7 +15,7 @@ from src.llm_news_filter import verificar_nota_tactica_min_tokens
 
 def formatear_mensaje_munetips(op: PropEvaluationResult) -> str:
     """
-    Formato limpio y directo de 7 renglones para el canal 'Muñetips'.
+    Formato limpio y directo de 7 renglones en HTML seguro para el canal 'Muñetips'.
     Traduce OVER/UNDER a 'MÁS DE' / 'MENOS DE' igual que en los botones de Playdoit,
     e indica la línea objetivo y el momio mínimo aceptable a verificar en Playdoit.
     """
@@ -40,14 +42,20 @@ def formatear_mensaje_munetips(op: PropEvaluationResult) -> str:
         catalyst_reason=op.catalyst_reason,
     )
 
+    canal_safe = html.escape(config.CHANNEL_NAME.upper())
+    jug_safe = html.escape(op.player_name)
+    team_safe = html.escape(op.team_abbr)
+    opp_safe = html.escape(op.opponent_abbr)
+    nota_safe = html.escape(nota_tactica)
+
     mensaje = (
-        f"🎯 *{config.CHANNEL_NAME.upper()}*  |  ⭐ *{op.score_1_to_10} / 10* _(Prob: {op.blended_prob * 100:.0f}%)_\n\n"
-        f"🏀 *{op.team_abbr} vs {op.opponent_abbr}*\n"
-        f"👤 *{op.player_name}* — *{lado_es} {op.playdoit_line} {mercado_es}*\n"
-        f"📂 _{pestana_playdoit}_\n\n"
-        f"🛑 *Momio Mínimo Playdoit:* `{min_am}` (`{op.min_acceptable_odds:.2f}`)  |  *Ref:* `{momio_ref_am}` (`{op.playdoit_odds:.2f}`)\n"
-        f"💵 *Apostar:* `${op.suggested_stake_mxn:.0f} MXN`\n"
-        f"⚡ _{nota_tactica}_"
+        f"🎯 <b>{canal_safe}</b>  |  ⭐ <b>{op.score_1_to_10} / 10</b> <i>(Prob: {op.blended_prob * 100:.0f}%)</i>\n\n"
+        f"🏀 <b>{team_safe} vs {opp_safe}</b>\n"
+        f"👤 <b>{jug_safe}</b> — <b>{lado_es} {op.playdoit_line} {mercado_es}</b>\n"
+        f"📂 <i>{pestana_playdoit}</i>\n\n"
+        f"🛑 <b>Momio Mínimo Playdoit:</b> <code>{min_am}</code> (<code>{op.min_acceptable_odds:.2f}</code>)  |  <b>Ref Sharp:</b> <code>{momio_ref_am}</code> (<code>{op.playdoit_odds:.2f}</code>)\n"
+        f"💵 <b>Apostar:</b> <code>${op.suggested_stake_mxn:.0f} MXN</code>\n"
+        f"⚡ <i>{nota_safe}</i>"
     )
     return mensaje
 
@@ -57,7 +65,7 @@ def enviar_alerta_telegram(
     bot_token: Optional[str] = None,
     chat_id: Optional[str] = None,
 ) -> bool:
-    """Envía el mensaje en formato Markdown al canal 'Muñetips'."""
+    """Envía el mensaje en formato HTML seguro al canal 'Muñetips'."""
     token = (bot_token or config.TELEGRAM_BOT_TOKEN).strip()
     destino = (chat_id or config.TELEGRAM_CHAT_ID or "@munetipsfc").strip()
     if destino.startswith("https://t.me/"):
@@ -73,7 +81,7 @@ def enviar_alerta_telegram(
     payload = {
         "chat_id": destino,
         "text": texto,
-        "parse_mode": "Markdown",
+        "parse_mode": "HTML",
         "disable_web_page_preview": True,
     }
 

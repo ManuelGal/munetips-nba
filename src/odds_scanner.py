@@ -254,27 +254,20 @@ def _procesar_libro_evento(
 
         # 3. Obtener estadísticas reales de temporada del jugador desde ESPN (independientes de las casas)
         perfil = ctx.active_players.get(p_norm)
-        if not perfil:
-            # El jugador no pertenece a la rotación de ninguno de los dos equipos de este partido: omitir
+        if not perfil or not perfil.has_real_stats:
+            # Omitir si el jugador no pertenece al partido o carece de estadísticas reales independientes en ESPN
+            # (Evita el bucle circular de despejar lambda de la línea Sharp para evaluarla contra sí misma)
             continue
 
-        if perfil.has_real_stats:
-            es_titular = perfil.is_starter
-            base_min = perfil.avg_minutes
-            pos_jug = perfil.position
-            if m_key == "player_points":
-                tasa_min_real = perfil.pts_per_min
-            elif m_key == "player_rebounds":
-                tasa_min_real = perfil.reb_per_min
-            else:
-                tasa_min_real = perfil.ast_per_min
+        es_titular = perfil.is_starter
+        base_min = perfil.avg_minutes
+        pos_jug = perfil.position
+        if m_key == "player_points":
+            tasa_min_real = perfil.pts_per_min
+        elif m_key == "player_rebounds":
+            tasa_min_real = perfil.reb_per_min
         else:
-            es_titular = perfil.is_starter
-            base_min = perfil.avg_minutes
-            pos_jug = perfil.position
-            sharp_p_over, _ = quitar_margen_casa(sharp_ov, sharp_un)
-            sharp_lambda_base = calcular_lambda_implicita_sharp(sharp_p_over, sharp_line, m_key)
-            tasa_min_real = sharp_lambda_base / max(15.0, base_min)
+            tasa_min_real = perfil.ast_per_min
 
         equipo_jug = perfil.team_abbr
         rival_jug = ctx.away_team if equipo_jug == ctx.home_team else ctx.home_team
