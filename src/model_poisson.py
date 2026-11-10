@@ -418,9 +418,9 @@ def aplicar_asimetria_lesion_playdoit(
     p_void_1h = getattr(config, "PLAYDOIT_FIRST_HALF_VOID_PROB", 0.010)
     p_loss_2h = getattr(config, "PLAYDOIT_SECOND_HALF_LOSS_PROB", 0.008)
 
+    prob_void_over = p_void_1h
     prob_win_over = p_ov * (1.0 - p_void_1h - p_loss_2h)
-    prob_void_over = p_ov * p_void_1h
-    prob_win_under = p_un + (p_ov * (p_void_1h + p_loss_2h))
+    prob_win_under = p_un + ((1.0 - p_un) * (p_void_1h + p_loss_2h))
 
     return (
         min(0.99, max(0.01, prob_win_over)),

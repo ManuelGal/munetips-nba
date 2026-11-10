@@ -142,7 +142,7 @@ def _extraer_tope_minutos_de_texto(texto: str) -> Optional[float]:
     # NUNCA coincidir con oraciones pasadas ("was on a...") ni negaciones ("no 20-minute restriction")
     patrones = [
         r"(?:restriction|limit|capped|restricted)\s+(?:of|to|around|at)?\s*(\d{2})\s*(?:-\s*(\d{2}))?\s*min",
-        r"(\d{2})\s*(?:-\s*(\d{2}))?\s*minute\s*(?:restriction|limit|cap)",
+        r"(\d{2})\s*(?:-\s*(\d{2}))?\s*(?:-|\s)?\s*min(?:ute)?s?\s*(?:restriction|limit|cap|capped|restricted)",
     ]
     negaciones_previas = ("no ", "not ", "without ", "zero ", "lifted", "cleared", "was on ", "had a ")
     for pat in patrones:
