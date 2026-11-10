@@ -115,24 +115,35 @@ def calificar_historial(fecha_str: str = None):
         print(f"ℹ️ No existe el archivo {csv_path}. Aún no se han emitido alertas para calificar.")
         return
 
-    if not fecha_str:
-        # Por defecto ayer o hoy
-        fecha_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    ahora_utc = datetime.now(timezone.utc)
+    fechas_objetivo = (
+        [fecha_str]
+        if fecha_str
+        else [
+            (ahora_utc - timedelta(days=1)).strftime("%Y-%m-%d"),
+            ahora_utc.strftime("%Y-%m-%d"),
+        ]
+    )
 
     print(f"\n=========================================================================================")
-    print(f"🏆 AUDITORÍA DE RESULTADOS Y SETTLEMENT POST-PARTIDO ({fecha_str})")
+    print(f"🏆 AUDITORÍA DE RESULTADOS Y SETTLEMENT POST-PARTIDO ({', '.join(fechas_objetivo)})")
     print(f"=========================================================================================")
     
-    stats = obtener_stats_partidos_espn(fecha_str)
-    if not stats:
-        print(f"ℹ️ No se encontraron partidos finalizados para la fecha {fecha_str} en ESPN.")
+    stats_por_fecha: dict[str, dict] = {}
+    for f_obj in fechas_objetivo:
+        st_dia = obtener_stats_partidos_espn(f_obj)
+        if st_dia:
+            stats_por_fecha[f_obj] = st_dia
+
+    if not stats_por_fecha:
+        print(f"ℹ️ No se encontraron partidos finalizados para {fechas_objetivo} en ESPN.")
         return
 
     filas = []
     modificado = False
     with open(csv_path, "r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
-        campos = reader.fieldnames or []
+        campos = list(reader.fieldnames or [])
         for extra in ["resultado", "stat_real", "profit_mxn"]:
             if extra not in campos:
                 campos.append(extra)
@@ -146,21 +157,42 @@ def calificar_historial(fecha_str: str = None):
 
     for r in filas:
         f_alerta = r.get("fecha_utc", "").split(" ")[0]
-        if f_alerta != fecha_str:
+        if f_alerta not in fechas_objetivo:
+            continue
+        # Si ya fue calificada previamente y no se forzó una fecha específica, respetarla
+        if r.get("resultado") and not fecha_str:
+            continue
+
+        # Buscar primero en la fecha UTC de la alerta; si la alerta salió tras las 00:00 UTC
+        # (6:00 PM CDMX), el partido en ESPN pertenece al día calendario anterior en EE.UU./México.
+        candidatos_stats = []
+        if f_alerta in stats_por_fecha:
+            candidatos_stats.append(stats_por_fecha[f_alerta])
+        try:
+            dt_prev = (datetime.strptime(f_alerta, "%Y-%m-%d") - timedelta(days=1)).strftime("%Y-%m-%d")
+            if dt_prev in stats_por_fecha and stats_por_fecha[dt_prev] not in candidatos_stats:
+                candidatos_stats.append(stats_por_fecha[dt_prev])
+        except Exception:
+            pass
+
+        if not candidatos_stats:
             continue
             
         jugador = r.get("jugador", "")
         mercado = r.get("mercado", "")
         lado = r.get("lado", "").upper()
         linea = float(r.get("linea_playdoit", 0.0))
-        cuota = float(r.get("cuota_playdoit", 1.90))
-        stake = float(r.get("stake_sugerido_mxn", 300.0))
+        cuota = float(r.get("cuota_playdoit", 1.87))
+        stake = float(r.get("stake_sugerido_mxn", 20.0))
         
         j_norm = normalizar(jugador)
         st = None
-        for k, v in stats.items():
-            if k in j_norm or j_norm in k:
-                st = v
+        for mapa_stats in candidatos_stats:
+            for k, v in mapa_stats.items():
+                if k in j_norm or j_norm in k:
+                    st = v
+                    break
+            if st:
                 break
                 
         if not st:

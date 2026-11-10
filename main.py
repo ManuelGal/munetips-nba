@@ -90,6 +90,9 @@ def registrar_pick_csv(op: PropEvaluationResult) -> bool:
             "score_1_a_10",
             "stake_sugerido_mxn",
             "motivo",
+            "resultado",
+            "stat_real",
+            "profit_mxn",
         ]
         writer = csv.DictWriter(f, fieldnames=campos)
         if escribir_cabecera:
@@ -113,6 +116,9 @@ def registrar_pick_csv(op: PropEvaluationResult) -> bool:
                 "score_1_a_10": op.score_1_to_10,
                 "stake_sugerido_mxn": op.suggested_stake_mxn,
                 "motivo": op.catalyst_reason,
+                "resultado": "",
+                "stat_real": "",
+                "profit_mxn": "",
             }
         )
     return True

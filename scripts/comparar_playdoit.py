@@ -78,11 +78,11 @@ def analizar_captura(ruta_json: Path):
         print("⚠️ No hay líneas registradas en este JSON. Revisa la captura.")
         return
         
-    # Indexar mercados por jugador normalizado
+    # Indexar mercados por jugador normalizado (lista para soportar Puntos, Rebotes y Asistencias del mismo jugador)
     mercados_dict = {}
     for m in mercados:
         j_norm = normalizar(m.get("jugador", ""))
-        mercados_dict[j_norm] = m
+        mercados_dict.setdefault(j_norm, []).append(m)
 
     # 1. Tabla de Cuotas y Cumplimiento de Rollover
     print(f"{'JUGADOR':<25} {'LÍNEA':<7} {'MÁS DE':<15} {'MENOS DE':<15} {'ROLLOVER OVER':<15} {'ROLLOVER UNDER'}")
@@ -133,12 +133,15 @@ def analizar_captura(ruta_json: Path):
                 linea_al = float(al.get("linea_playdoit", 0))
                 lado_al = al.get("lado", "").upper()
                 
-                # Buscar en la captura
-                encontrado = None
-                for k, v in mercados_dict.items():
+                # Buscar en la captura (eligiendo la línea más cercana al mercado de la alerta)
+                candidatos_jug = []
+                for k, lista_m in mercados_dict.items():
                     if k in j_al_norm or j_al_norm in k:
-                        encontrado = v
-                        break
+                        candidatos_jug.extend(lista_m)
+                        
+                encontrado = None
+                if candidatos_jug:
+                    encontrado = min(candidatos_jug, key=lambda x: abs(float(x.get("linea", 0)) - linea_al))
                         
                 if encontrado:
                     cuota_real_str = encontrado.get("momio_menos_de" if "UNDER" in lado_al else "momio_mas_de")

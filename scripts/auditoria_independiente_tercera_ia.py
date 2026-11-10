@@ -213,14 +213,17 @@ def test_suite_5_ordenamiento_alertas():
 
 def test_suite_6_workflow_nube_y_liquidacion():
     print("\n--- SUITE 6: Verificación de Automatización en GitHub Actions ---")
-    print("Objetivo: Confirmar que el workflow 24/7 en la nube liquida apuestas y actualiza la bitácora.")
+    print("Objetivo: Confirmar que el workflow 24/7 en la nube liquida apuestas, actualiza la bitácora y cuida los 500 créditos.")
     
     wf_path = BASE_DIR / ".github" / "workflows" / "munetips_cloud.yml"
+    if not wf_path.exists():
+        wf_path = BASE_DIR / ".github" / "workflows" / "main.yml"
     with open(wf_path, "r", encoding="utf-8") as f:
         codigo_wf = f.read()
         
     tiene_liquidacion = "verificar_resultados.py" in codigo_wf
     tiene_commit = "git commit -m" in codigo_wf and "git push origin main" in codigo_wf
+    num_crons = codigo_wf.count("- cron:")
     
     assert_test(
         "Workflow ejecuta 'scripts/verificar_resultados.py' automáticamente",
@@ -231,6 +234,11 @@ def test_suite_6_workflow_nube_y_liquidacion():
         "Workflow persiste los resultados en GitHub (commit y push)",
         tiene_commit,
         "Falta la persistencia git de datos"
+    )
+    assert_test(
+        f"Presupuesto API protegido: exactamente 3 ejecuciones cron diarias (encontradas: {num_crons})",
+        num_crons == 3,
+        f"Se esperaban 3 crons diarios para no agotar los 500 créditos, pero hay {num_crons}"
     )
 
 
@@ -259,6 +267,100 @@ def test_suite_7_integridad_bookmarklet():
     )
 
 
+def test_suite_8_parches_consenso_red_team():
+    print("\n--- SUITE 8: Verificación de Parches de Consenso (Auditoría Red Team) ---")
+    print("Objetivo: Confirmar los 5 blindajes estructurales acordados entre ambas IAs auditoras.")
+
+    # 1. Signo del spread cuando el visitante es favorito en nba_data.py
+    with open(BASE_DIR / "src" / "nba_data.py", "r", encoding="utf-8") as f:
+        codigo_nba = f.read()
+    corrige_spread_visitante = "fav_abbr == away_team_abbr.upper().strip()" in codigo_nba
+    assert_test(
+        "nba_data.py asigna signo correcto a home_spread cuando el favorito es visitante",
+        corrige_spread_visitante,
+        "Falta la verificación fav_abbr == away_team_abbr en nba_data.py"
+    )
+
+    # 2. Eliminación del fallback circular a sharp_line en odds_scanner.py
+    with open(BASE_DIR / "src" / "odds_scanner.py", "r", encoding="utf-8") as f:
+        codigo_scanner = f.read()
+    sin_fallback_circular = "if not perfil or not perfil.has_real_stats:" in codigo_scanner and "sharp_line / max(base_min" not in codigo_scanner
+    assert_test(
+        "odds_scanner.py omite jugadores sin estadísticas reales independientes (sin bucle circular)",
+        sin_fallback_circular,
+        "Sigue existiendo el fallback circular a sharp_line en odds_scanner.py"
+    )
+
+    # 3. VOID (Lesión 1H) en apuestas OVER dentro de verificar_resultados.py
+    with open(BASE_DIR / "scripts" / "verificar_resultados.py", "r", encoding="utf-8") as f:
+        codigo_verif = f.read()
+    void_over_1h = 'elif 0 < st["min"] <= 14.0:' in codigo_verif and 'res = "VOID (Lesión 1H)"' in codigo_verif
+    assert_test(
+        "verificar_resultados.py liquida como VOID (Lesión 1H) los OVER con salida médica <= 14 min",
+        void_over_1h,
+        "Falta la rama VOID (Lesión 1H) para OVER en verificar_resultados.py"
+    )
+
+    # 4. Telegram con parse_mode HTML y html.escape
+    with open(BASE_DIR / "src" / "telegram_notifier.py", "r", encoding="utf-8") as f:
+        codigo_tg = f.read()
+    usa_html_seguro = '"parse_mode": "HTML"' in codigo_tg and "html.escape(" in codigo_tg
+    assert_test(
+        "telegram_notifier.py utiliza parse_mode='HTML' con html.escape() contra errores 400",
+        usa_html_seguro,
+        "telegram_notifier.py no está usando HTML seguro con html.escape"
+    )
+
+    # 5. Piso estricto 1.0 para EV <= 0 en calcular_score_1_a_10
+    score_ev_neg = calcular_score_1_a_10(
+        ev_pct=-0.03,
+        win_prob=0.58,
+        side="UNDER",
+        playdoit_line=20.5,
+        sharp_line=19.5,
+        has_injury_catalyst=True,
+        game_spread=-11.0,
+        is_starter=True,
+    )
+    assert_test(
+        f"calcular_score_1_a_10 devuelve piso estricto 1.0 cuando EV <= 0 (obtenido: {score_ev_neg})",
+        score_ev_neg == 1.0,
+        f"Se esperaba 1.0 para EV negativo, se obtuvo {score_ev_neg}"
+    )
+
+    # 6. Esquema CSV unificado de 20 columnas entre main.py y verificar_resultados.py
+    with open(BASE_DIR / "main.py", "r", encoding="utf-8") as f:
+        codigo_main_csv = f.read()
+    esquema_csv_unificado = (
+        '"resultado"' in codigo_main_csv
+        and '"stat_real"' in codigo_main_csv
+        and '"profit_mxn"' in codigo_main_csv
+    )
+    assert_test(
+        "main.py inicializa las columnas 'resultado', 'stat_real' y 'profit_mxn' para no desfasar el CSV",
+        esquema_csv_unificado,
+        "Faltan las columnas de liquidación en registrar_pick_csv de main.py"
+    )
+
+    # 7. Liquidación multi-día (ayer y hoy) en verificar_resultados.py
+    liquida_ayer_y_hoy = "timedelta(days=1)" in codigo_verif and "fechas_objetivo" in codigo_verif
+    assert_test(
+        "verificar_resultados.py audita tanto la jornada de ayer como la de hoy (evita olvido matutino)",
+        liquida_ayer_y_hoy,
+        "verificar_resultados.py solo revisaba la fecha UTC actual y omitía la noche anterior"
+    )
+
+    # 8. Soporte multi-mercado por jugador en comparar_playdoit.py
+    with open(BASE_DIR / "scripts" / "comparar_playdoit.py", "r", encoding="utf-8") as f:
+        codigo_comp = f.read()
+    soporta_multimercado = "setdefault(j_norm, []).append(m)" in codigo_comp
+    assert_test(
+        "comparar_playdoit.py agrupa múltiples mercados (Puntos/Rebotes/Asistencias) por jugador sin sobrescribirlos",
+        soporta_multimercado,
+        "comparar_playdoit.py sobrescribía mercados del mismo jugador"
+    )
+
+
 def main():
     print(f"\n=========================================================================================")
     print(f"🤖 REPORTE DE AUDITORÍA INDEPENDIENTE PARA TERCERA IA — MUNETIPS NBA QUANT PIPELINE")
@@ -273,6 +375,7 @@ def main():
     test_suite_5_ordenamiento_alertas()
     test_suite_6_workflow_nube_y_liquidacion()
     test_suite_7_integridad_bookmarklet()
+    test_suite_8_parches_consenso_red_team()
     
     print("\n=========================================================================================")
     pct = (pruebas_pasadas / total_pruebas) * 100.0 if total_pruebas > 0 else 0

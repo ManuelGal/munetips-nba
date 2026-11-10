@@ -54,6 +54,9 @@ jobs:
           git config user.name "Munetips Quant Bot"
           git config user.email "bot@munetips.local"
 
+          # 0. Auto-verificación matemática y estructural (0 créditos API, <0.1s)
+          python scripts/auditoria_independiente_tercera_ia.py
+
           MODO="${{ github.event.inputs.modo }}"
           if [ "$MODO" = "demo" ]; then
             python main.py --demo
