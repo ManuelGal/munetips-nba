@@ -2327,7 +2327,7 @@
     "pts_per_min": 0.6599,
     "reb_per_min": 0.1088,
     "ast_per_min": 0.1497,
-    "minutes_cap": 20.0,
+    "minutes_cap": null,
     "has_real_stats": true
   },
   "4279888": {
