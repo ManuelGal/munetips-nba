@@ -6,7 +6,7 @@ para ejecución gratuita 24/7 en la nube (GitHub Actions) con tu computadora apa
 import argparse
 import csv
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import config
 
 
@@ -51,19 +51,23 @@ from src.telegram_notifier import (
 def registrar_pick_csv(op: PropEvaluationResult) -> bool:
     """
     Registra la señal en `data/munetips_historial_clv.csv` y verifica si ya se envió
-    hoy la misma alerta para no hacer spam en el canal 'Muñetips'.
-    Devuelve True si es una señal NUEVA del día.
+    en la misma jornada operativa NBA (UTC-6) para no duplicar alertas después de las 00:00 UTC.
+    Devuelve True si es una señal NUEVA de la jornada.
     """
     os.makedirs(config.DATA_DIR, exist_ok=True)
-    fecha_hoy = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    clave_unica = f"{fecha_hoy}|{op.player_name}|{op.market_type}|{op.side}|{op.playdoit_line}"
+    ahora_utc = datetime.now(timezone.utc)
+    fecha_nba = (ahora_utc - timedelta(hours=6)).strftime("%Y-%m-%d")
+    fecha_utc = ahora_utc.strftime("%Y-%m-%d")
+    sufijo_pick = f"{op.player_name}|{op.market_type}|{op.side}|{op.playdoit_line}"
+    clave_unica = f"{fecha_nba}|{sufijo_pick}"
+    clave_utc_legado = f"{fecha_utc}|{sufijo_pick}"
 
     ya_existe = False
     if os.path.exists(config.PICKS_LOG_CSV):
         with open(config.PICKS_LOG_CSV, "r", encoding="utf-8", newline="") as f:
             reader = csv.DictReader(f)
             for row in reader:
-                if row.get("id_unico") == clave_unica:
+                if row.get("id_unico") in (clave_unica, clave_utc_legado):
                     ya_existe = True
                     break
 

@@ -108,40 +108,32 @@ def _calcular_sinergia_posicional(
         afinidad_min = 0.25
 
     if not es_titular:
-        extra_min = min(6.5, baja_min * 0.20 * afinidad_min)
+        extra_min = min(4.0, baja_min * 0.12 * afinidad_min)
     else:
-        extra_min = min(2.8, baja_min * 0.08 * afinidad_min)
+        extra_min = min(2.0, baja_min * 0.05 * afinidad_min)
 
     boost_tasa = 0.0
     if market_type == "player_assists":
         es_creador = (g_baja == "GUARD") or (baja_ast_pm >= 0.16)
         if es_creador:
             if g_jug == "GUARD":
-                boost_tasa = 0.11
+                boost_tasa = 0.04
             elif g_jug == "WING":
-                boost_tasa = 0.06
-            else:
-                boost_tasa = 0.03
-        else:
-            boost_tasa = 0.02
-    elif market_type == "player_rebounds":
-        es_reboteador = (g_baja == "BIG") or (baja_reb_pm >= 0.22)
-        if es_reboteador:
-            if g_jug == "BIG":
-                boost_tasa = 0.11
-            elif g_jug == "WING":
-                boost_tasa = 0.06
-            else:
                 boost_tasa = 0.025
+            else:
+                boost_tasa = 0.015
         else:
-            boost_tasa = 0.02
+            boost_tasa = 0.01
+    elif market_type == "player_rebounds":
+        # En rebotes la tasa por minuto (TRB%) es estacionaria; el volumen sube solo por minutos extra
+        boost_tasa = 0.0
     else:  # player_points
         if g_jug == g_baja:
-            boost_tasa = 0.075
+            boost_tasa = 0.04
         elif "WING" in (g_jug, g_baja):
-            boost_tasa = 0.055
+            boost_tasa = 0.025
         else:
-            boost_tasa = 0.040
+            boost_tasa = 0.015
 
     return extra_min, boost_tasa
 
@@ -181,7 +173,7 @@ def proyectar_minutos_y_media(inp: PlayerProjectionInput) -> tuple[float, float,
         b_pos = getattr(b, "position", inp.position)
         b_reb = float(getattr(b, "reb_per_min", 0.18) or 0.18)
         b_ast = float(getattr(b, "ast_per_min", 0.12) or 0.12)
-        b_new = bool(getattr(b, "is_newly_out", False) or inp.is_breaking_injury)
+        b_new = bool(getattr(b, "is_newly_out", False))
 
         ex_m, ex_boost = _calcular_sinergia_posicional(
             pos_jugador=inp.position,
@@ -203,9 +195,9 @@ def proyectar_minutos_y_media(inp: PlayerProjectionInput) -> tuple[float, float,
         else:
             nombres_bajas_previas.append(b_name)
 
-    tope_extra_min = 8.5 if not inp.is_starter else 4.5
+    tope_extra_min = 4.5 if not inp.is_starter else 2.5
     total_extra_min = min(tope_extra_min, total_extra_min)
-    total_boost_tasa = min(0.22, total_boost_tasa)
+    total_boost_tasa = min(0.08, total_boost_tasa)
 
     if total_extra_min > 0.2 or total_boost_tasa > 0.01:
         minutos += total_extra_min
@@ -542,13 +534,23 @@ def evaluar_oportunidad_prop(
         return None
 
     # 1. Proyección estadística independiente (basada en tasas reales de temporada + sinergia posicional + spread)
-    proj_min, proj_lambda, notas = proyectar_minutos_y_media(inp)
-    raw_model_over, raw_model_under = calcular_probabilidad_linea(
-        proj_lambda, playdoit_line, inp.market_type
-    )
+    proj_min, raw_proj_lambda, notas = proyectar_minutos_y_media(inp)
 
     # 2. Probabilidad justa del consenso Sharp sin vig (Power Method) ajustada a la línea objetivo
     sharp_base_over, _ = quitar_margen_casa(sharp_over_odds, sharp_under_odds)
+    sharp_implied_lambda = calcular_lambda_implicita_sharp(
+        sharp_base_over, sharp_line, inp.market_type
+    )
+
+    # 2.1 Empirical Bayes Shrinkage: anclar la base empírica (40%) a la media implícita Sharp (60%)
+    #     y aplicar únicamente sobre esa base anclada el multiplicador neto del catalizador de hoy (M_cat)
+    base_emp_lambda = max(0.5, inp.base_minutes * inp.rate_per_minute)
+    m_cat = raw_proj_lambda / base_emp_lambda
+    proj_lambda = round(((0.60 * sharp_implied_lambda) + (0.40 * base_emp_lambda)) * m_cat, 3)
+
+    raw_model_over, raw_model_under = calcular_probabilidad_linea(
+        proj_lambda, playdoit_line, inp.market_type
+    )
     raw_sharp_over, raw_sharp_under = ajustar_prob_sharp_por_diferencia_de_linea(
         sharp_base_over, sharp_line, playdoit_line, inp.market_type
     )
@@ -562,8 +564,8 @@ def evaluar_oportunidad_prop(
     )
 
     tiene_baja_reciente = bool(
-        inp.is_breaking_injury
-        or any(getattr(b, "is_newly_out", False) for b in (inp.teammates_out or []))
+        any(getattr(b, "is_newly_out", False) for b in (inp.teammates_out or []))
+        or (not inp.teammates_out and inp.is_breaking_injury)
     )
     peso_modelo = 0.55 if (tiene_baja_reciente or inp.minutes_cap_news) else 0.45
 
@@ -610,8 +612,14 @@ def evaluar_oportunidad_prop(
         if odds < config.MIN_PLAYDOIT_ODDS_DECIMAL or odds > config.MAX_PLAYDOIT_ODDS_DECIMAL:
             continue
 
-        if side == "OVER" and playdoit_line > sharp_line:
-            continue
+        if side == "OVER":
+            if playdoit_line > sharp_line:
+                continue
+            # Guardrail anti-sobreproyección en OVER cuando no hay ventaja de línea vs Sharp
+            if abs(playdoit_line - sharp_line) < 0.05 and (
+                sharp_base_over < 0.485 or proj_lambda > 1.22 * sharp_line
+            ):
+                continue
         if side == "UNDER" and playdoit_line < sharp_line:
             continue
 

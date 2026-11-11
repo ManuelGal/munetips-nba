@@ -34,9 +34,16 @@ from src.model_poisson import (
     calcular_ev_real_playdoit,
     aplicar_asimetria_lesion_playdoit,
     PlayerProjectionInput,
+    TeammateOutInfo,
+    proyectar_minutos_y_media,
+    _calcular_sinergia_posicional,
     evaluar_oportunidad_prop,
 )
-from src.nba_data import _extraer_tope_minutos_de_texto, normalizar_nombre
+from src.nba_data import (
+    _extraer_tope_minutos_de_texto,
+    _evaluar_transicion_lesion,
+    normalizar_nombre,
+)
 from scripts.comparar_playdoit import momio_americano_a_decimal, cumple_rollover
 
 COL_VERDE = "\033[92m"
@@ -361,6 +368,115 @@ def test_suite_8_parches_consenso_red_team():
     )
 
 
+def test_suite_9_blindaje_v2_1_anti_sobreproyeccion():
+    print("\n--- SUITE 9: Blindaje Anti-Sobreproyección v2.1 (5 Cambios + 3 Matices Red Team) ---")
+    print("Objetivo: Validar aislamiento de bajas, ventana 5 días, TRB% estacionario, Bayes Shrinkage y deduplicación UTC-6.")
+
+    # 1. Cambio 1: Aislamiento de is_newly_out por individuo (sin contagiar a bajas antiguas como Banchero)
+    inp_aislado = PlayerProjectionInput(
+        player_name="Wendell Carter Jr",
+        team_abbr="ORL",
+        opponent_abbr="SAC",
+        market_type="player_points",
+        is_starter=True,
+        base_minutes=33.6,
+        rate_per_minute=0.4405,
+        team_pace=99.5,
+        opp_pace=99.5,
+        game_spread=-2.5,
+        position="C",
+        teammates_out=[
+            TeammateOutInfo(player_name="Paolo Banchero", position="PF", avg_minutes=34.5, is_newly_out=False),
+            TeammateOutInfo(player_name="Tristan da Silva", position="SF", avg_minutes=22.0, is_newly_out=True),
+        ],
+        is_breaking_injury=True,
+    )
+    _, _, notas_aislado = proyectar_minutos_y_media(inp_aislado)
+    texto_notas = " | ".join(notas_aislado)
+    assert_test(
+        "Cambio 1: Baja antigua (Paolo Banchero, is_newly_out=False) NO se contagia cuando otro compañero es baja nueva",
+        "Tristan da Silva" in texto_notas and "Paolo Banchero" not in texto_notas,
+        f"Notas generadas: {texto_notas}"
+    )
+
+    # 2. Matiz 1: Compatibilidad con constructor simple (--demo) cuando teammates_out está vacío
+    inp_demo = PlayerProjectionInput(
+        player_name="Tre Mann",
+        team_abbr="CHA",
+        opponent_abbr="IND",
+        market_type="player_assists",
+        is_starter=False,
+        base_minutes=23.5,
+        rate_per_minute=0.185,
+        team_pace=101.8,
+        opp_pace=103.2,
+        game_spread=-4.5,
+        position="PG",
+        teammate_out_name="LaMelo Ball",
+        teammate_out_minutes=33.5,
+        is_breaking_injury=True,
+    )
+    min_demo, _, notas_demo = proyectar_minutos_y_media(inp_demo)
+    assert_test(
+        f"Matiz 1: Modo --demo sin lista teammates_out conserva shock de LaMelo Ball (min proyectados: {min_demo})",
+        min_demo > 23.5 and any("LaMelo Ball" in n for n in notas_demo),
+        f"Falló modo demo: min={min_demo}, notas={notas_demo}"
+    )
+
+    # 3. Cambio 2 y Matiz 2: Retrocompatibilidad str/dict y bloqueo del ciclo QUESTIONABLE -> OUT en <= 5 días
+    es_nueva_str, reg_dia1 = _evaluar_transicion_lesion("ACTIVE", "OUT", "2026-11-10")
+    _, reg_manana = _evaluar_transicion_lesion(reg_dia1, "QUESTIONABLE", "2026-11-11")
+    es_nueva_tarde, _ = _evaluar_transicion_lesion(reg_manana, "OUT", "2026-11-11")
+    assert_test(
+        "Cambio 2 + Matiz 2: Caché soporta str legado y bloquea falso positivo Day-To-Day (QUESTIONABLE -> OUT) dentro de 5 días",
+        es_nueva_str is True and es_nueva_tarde is False,
+        f"es_nueva_str={es_nueva_str}, es_nueva_tarde={es_nueva_tarde}"
+    )
+
+    # 4. Cambio 3: En rebotes boost_tasa es 0.0 (TRB% estacionario)
+    ex_min_reb, boost_reb = _calcular_sinergia_posicional(
+        pos_jugador="C",
+        es_titular=False,
+        market_type="player_rebounds",
+        baja_pos="C",
+        baja_min=32.0,
+        baja_reb_pm=0.30,
+        baja_ast_pm=0.08,
+    )
+    assert_test(
+        f"Cambio 3: En player_rebounds el boost de tasa por minuto es exactamente 0.0 (obtenido: {boost_reb}, extra_min: {ex_min_reb})",
+        boost_reb == 0.0 and 0.0 < ex_min_reb <= 4.0,
+        f"boost_reb={boost_reb}, ex_min_reb={ex_min_reb}"
+    )
+
+    # 5. Cambio 4: Empirical Bayes Shrinkage + Guardrail bloquea los OVER sobre-proyectados (caso Wendell Carter Jr.)
+    eval_carter = evaluar_oportunidad_prop(
+        inp=inp_aislado,
+        playdoit_line=13.5,
+        playdoit_over_odds=1.87,
+        playdoit_under_odds=1.87,
+        sharp_line=13.5,
+        sharp_over_odds=1.80,   # Sharp favorece Under (prob justa Over ~47.9% < 48.5%)
+        sharp_under_odds=1.96,
+    )
+    over_bloqueado = (eval_carter is None) or (eval_carter.side != "OVER")
+    assert_test(
+        "Cambio 4: Shrinkage Bayesiano + Guardrail bloquean OVER falso cuando el mercado Sharp está < 48.5%",
+        over_bloqueado,
+        f"Se permitió erróneamente OVER: {eval_carter}"
+    )
+
+    # 6. Cambio 5: Deduplicación por fecha operativa NBA (UTC-6) en main.py
+    with open(BASE_DIR / "main.py", "r", encoding="utf-8") as f:
+        codigo_main = f.read()
+    usa_fecha_nba = "timedelta(hours=6)" in codigo_main and "fecha_nba" in codigo_main
+    assert_test(
+        "Cambio 5: main.py deduplica alertas usando la fecha operativa NBA (UTC-6) para evitar duplicados post 00:00 UTC",
+        usa_fecha_nba,
+        "Falta timedelta(hours=6) / fecha_nba en registrar_pick_csv de main.py"
+    )
+
+
 def main():
     print(f"\n=========================================================================================")
     print(f"🤖 REPORTE DE AUDITORÍA INDEPENDIENTE PARA TERCERA IA — MUNETIPS NBA QUANT PIPELINE")
@@ -376,6 +492,7 @@ def main():
     test_suite_6_workflow_nube_y_liquidacion()
     test_suite_7_integridad_bookmarklet()
     test_suite_8_parches_consenso_red_team()
+    test_suite_9_blindaje_v2_1_anti_sobreproyeccion()
     
     print("\n=========================================================================================")
     pct = (pruebas_pasadas / total_pruebas) * 100.0 if total_pruebas > 0 else 0

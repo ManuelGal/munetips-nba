@@ -92,7 +92,7 @@ def normalizar_nombre(nombre: str) -> str:
     return " ".join(limpio.split())
 
 
-def cargar_cache_lesiones() -> dict[str, str]:
+def cargar_cache_lesiones() -> dict[str, Any]:
     if not os.path.exists(config.STATE_CACHE_FILE):
         return {}
     try:
@@ -102,10 +102,55 @@ def cargar_cache_lesiones() -> dict[str, str]:
         return {}
 
 
-def guardar_cache_lesiones(estado: dict[str, str]) -> None:
+def guardar_cache_lesiones(estado: dict[str, Any]) -> None:
     os.makedirs(config.DATA_DIR, exist_ok=True)
     with open(config.STATE_CACHE_FILE, "w", encoding="utf-8") as f:
         json.dump(estado, f, indent=2, ensure_ascii=False)
+
+
+def _evaluar_transicion_lesion(
+    prev_entry: Any,
+    current_status: str,
+    hoy_str: str,
+) -> tuple[bool, dict[str, Any]]:
+    """
+    Evalúa de forma retrocompatible (soporta `str` legado o `dict` con `last_out_date`)
+    si un jugador acaba de pasar genuinamente a OUT/DOUBTFUL hoy, ignorando el vaivén
+    diario de ESPN (OUT -> QUESTIONABLE/Day-To-Day -> OUT) dentro de una ventana de 5 días.
+    """
+    if isinstance(prev_entry, dict):
+        prev_status = prev_entry.get("status")
+        prev_last_out = prev_entry.get("last_out_date")
+    elif isinstance(prev_entry, str):
+        prev_status = prev_entry
+        prev_last_out = hoy_str if prev_entry in ("OUT", "DOUBTFUL") else None
+    else:
+        prev_status = None
+        prev_last_out = None
+
+    estuvo_out_reciente = False
+    if prev_last_out:
+        try:
+            dt_prev = datetime.strptime(str(prev_last_out)[:10], "%Y-%m-%d").date()
+            dt_hoy = datetime.strptime(hoy_str[:10], "%Y-%m-%d").date()
+            if 0 <= (dt_hoy - dt_prev).days <= 5:
+                estuvo_out_reciente = True
+        except Exception:
+            pass
+
+    es_nueva_baja = False
+    if current_status in ("OUT", "DOUBTFUL"):
+        if prev_status in ("ACTIVE", "QUESTIONABLE") and not estuvo_out_reciente:
+            es_nueva_baja = True
+        new_last_out = hoy_str
+    else:
+        new_last_out = prev_last_out
+
+    nuevo_registro = {
+        "status": current_status,
+        "last_out_date": new_last_out,
+    }
+    return es_nueva_baja, nuevo_registro
 
 
 def _cargar_cache_stats() -> dict[str, dict]:
@@ -436,6 +481,7 @@ def obtener_contexto_partidos_hoy() -> list[NBAGameContext]:
         newly_out_starters: list[PlayerStatsProfile] = []
         active_players: dict[str, PlayerStatsProfile] = {}
 
+        hoy_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         for team_entry in competitors:
             team_obj = team_entry.get("team", {})
             t_id = str(team_obj.get("id", ""))
@@ -444,12 +490,14 @@ def obtener_contexto_partidos_hoy() -> list[NBAGameContext]:
             perfiles = obtener_roster_y_bajas_equipo(t_id, t_abbr, cache_stats)
             for p in perfiles:
                 clave_norm = normalizar_nombre(p.player_name)
-                prev_status = cache_previa.get(clave_norm)
-                nuevo_estado_lesiones[clave_norm] = p.injury_status
+                prev_entry = cache_previa.get(clave_norm)
+                es_nueva_baja, nuevo_reg = _evaluar_transicion_lesion(
+                    prev_entry, p.injury_status, hoy_str
+                )
+                nuevo_estado_lesiones[clave_norm] = nuevo_reg
 
-                if p.injury_status in ("OUT", "DOUBTFUL") and p.avg_minutes >= 20.0:
-                    # Solo es "RECIÉN DESCARTADO" si estaba en caché previa Y su estado previo era ACTIVE o QUESTIONABLE
-                    if prev_status and prev_status in ("ACTIVE", "QUESTIONABLE"):
+                if p.injury_status in ("OUT", "DOUBTFUL") and p.has_real_stats and p.avg_minutes >= 20.0:
+                    if es_nueva_baja:
                         p.is_newly_out = True
                         p.injury_detail = f"RECIÉN DESCARTADO ({p.injury_status}) — " + p.injury_detail
                     newly_out_starters.append(p)
