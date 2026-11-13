@@ -1,6 +1,6 @@
 {
   "3136193": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 33.9,
     "pts_per_min": 0.7404,
     "reb_per_min": 0.0796,
@@ -9,7 +9,7 @@
     "has_real_stats": true
   },
   "4066383": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 30.1,
     "pts_per_min": 0.4983,
     "reb_per_min": 0.2458,
@@ -18,7 +18,7 @@
     "has_real_stats": true
   },
   "3155526": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 29.8,
     "pts_per_min": 0.5,
     "reb_per_min": 0.1309,
@@ -27,7 +27,7 @@
     "has_real_stats": true
   },
   "4888725": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 17.6,
     "pts_per_min": 0.3295,
     "reb_per_min": 0.2273,
@@ -36,7 +36,7 @@
     "has_real_stats": true
   },
   "4278585": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 24.2,
     "pts_per_min": 0.2975,
     "reb_per_min": 0.0909,
@@ -45,7 +45,7 @@
     "has_real_stats": true
   },
   "4278402": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 17.8,
     "pts_per_min": 0.5337,
     "reb_per_min": 0.1854,
@@ -54,16 +54,16 @@
     "has_real_stats": true
   },
   "4437244": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 27.7,
     "pts_per_min": 0.426,
     "reb_per_min": 0.1191,
     "ast_per_min": 0.1227,
-    "minutes_cap": null,
+    "minutes_cap": 21.0,
     "has_real_stats": true
   },
   "4601023": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 21.0,
     "pts_per_min": 0.3095,
     "reb_per_min": 0.2571,
@@ -72,7 +72,7 @@
     "has_real_stats": true
   },
   "3913174": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 16.6,
     "pts_per_min": 0.5,
     "reb_per_min": 0.0783,
@@ -81,7 +81,7 @@
     "has_real_stats": true
   },
   "5203685": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 19.8,
     "pts_per_min": 0.4091,
     "reb_per_min": 0.3232,
@@ -90,7 +90,7 @@
     "has_real_stats": true
   },
   "4431695": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 8.7,
     "pts_per_min": 0.3908,
     "reb_per_min": 0.1379,
@@ -99,7 +99,7 @@
     "has_real_stats": true
   },
   "4701232": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 23.6,
     "pts_per_min": 0.4958,
     "reb_per_min": 0.339,
@@ -630,25 +630,25 @@
     "has_real_stats": true
   },
   "4278129": {
-    "date": "2026-11-12",
-    "avg_minutes": 15.0,
-    "pts_per_min": 0.3333,
-    "reb_per_min": 0.34,
-    "ast_per_min": 0.06,
+    "date": "2026-11-13",
+    "avg_minutes": 14.5,
+    "pts_per_min": 0.331,
+    "reb_per_min": 0.331,
+    "ast_per_min": 0.0552,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "4845374": {
-    "date": "2026-11-12",
-    "avg_minutes": 19.3,
-    "pts_per_min": 0.285,
-    "reb_per_min": 0.0984,
-    "ast_per_min": 0.114,
+    "date": "2026-11-13",
+    "avg_minutes": 18.5,
+    "pts_per_min": 0.2757,
+    "reb_per_min": 0.0973,
+    "ast_per_min": 0.1081,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "4432907": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 18.3,
     "pts_per_min": 0.3989,
     "reb_per_min": 0.4098,
@@ -657,52 +657,52 @@
     "has_real_stats": true
   },
   "5104155": {
-    "date": "2026-11-12",
-    "avg_minutes": 25.8,
-    "pts_per_min": 0.2791,
-    "reb_per_min": 0.1434,
-    "ast_per_min": 0.0271,
+    "date": "2026-11-13",
+    "avg_minutes": 25.7,
+    "pts_per_min": 0.2724,
+    "reb_per_min": 0.1518,
+    "ast_per_min": 0.0311,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "6583": {
-    "date": "2026-11-12",
-    "avg_minutes": 33.1,
-    "pts_per_min": 0.7764,
-    "reb_per_min": 0.2931,
-    "ast_per_min": 0.0604,
+    "date": "2026-11-13",
+    "avg_minutes": 33.2,
+    "pts_per_min": 0.759,
+    "reb_per_min": 0.3012,
+    "ast_per_min": 0.0542,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "5142718": {
-    "date": "2026-11-12",
-    "avg_minutes": 32.4,
-    "pts_per_min": 0.5154,
-    "reb_per_min": 0.1883,
-    "ast_per_min": 0.0648,
+    "date": "2026-11-13",
+    "avg_minutes": 32.6,
+    "pts_per_min": 0.5,
+    "reb_per_min": 0.181,
+    "ast_per_min": 0.0644,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "5174563": {
-    "date": "2026-11-12",
-    "avg_minutes": 33.2,
-    "pts_per_min": 0.5392,
-    "reb_per_min": 0.1325,
-    "ast_per_min": 0.1476,
+    "date": "2026-11-13",
+    "avg_minutes": 33.7,
+    "pts_per_min": 0.549,
+    "reb_per_min": 0.1424,
+    "ast_per_min": 0.1424,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "5238230": {
-    "date": "2026-11-12",
-    "avg_minutes": 22.4,
-    "pts_per_min": 0.3929,
-    "reb_per_min": 0.0804,
-    "ast_per_min": 0.0357,
+    "date": "2026-11-13",
+    "avg_minutes": 23.0,
+    "pts_per_min": 0.4087,
+    "reb_per_min": 0.0826,
+    "ast_per_min": 0.0348,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "6609": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 13.8,
     "pts_per_min": 0.1739,
     "reb_per_min": 0.1159,
@@ -711,16 +711,16 @@
     "has_real_stats": true
   },
   "5160992": {
-    "date": "2026-11-12",
-    "avg_minutes": 25.7,
-    "pts_per_min": 0.3852,
-    "reb_per_min": 0.2802,
-    "ast_per_min": 0.07,
+    "date": "2026-11-13",
+    "avg_minutes": 25.6,
+    "pts_per_min": 0.3711,
+    "reb_per_min": 0.2852,
+    "ast_per_min": 0.0625,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "4997537": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 13.7,
     "pts_per_min": 0.6569,
     "reb_per_min": 0.219,
@@ -729,7 +729,7 @@
     "has_real_stats": true
   },
   "4606840": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 20.6,
     "pts_per_min": 0.3592,
     "reb_per_min": 0.1893,
@@ -738,16 +738,16 @@
     "has_real_stats": true
   },
   "4277905": {
-    "date": "2026-11-12",
-    "avg_minutes": 35.5,
-    "pts_per_min": 0.5211,
-    "reb_per_min": 0.0901,
-    "ast_per_min": 0.2451,
+    "date": "2026-11-13",
+    "avg_minutes": 35.3,
+    "pts_per_min": 0.5184,
+    "reb_per_min": 0.0907,
+    "ast_per_min": 0.2351,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "3135045": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 26.6,
     "pts_per_min": 0.5752,
     "reb_per_min": 0.1053,
@@ -756,7 +756,7 @@
     "has_real_stats": true
   },
   "5060701": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 12.3,
     "pts_per_min": 0.2764,
     "reb_per_min": 0.1301,
@@ -765,7 +765,7 @@
     "has_real_stats": true
   },
   "4433249": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 28.8,
     "pts_per_min": 0.309,
     "reb_per_min": 0.316,
@@ -774,7 +774,7 @@
     "has_real_stats": true
   },
   "4602025": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 25.5,
     "pts_per_min": 0.2471,
     "reb_per_min": 0.1216,
@@ -783,7 +783,7 @@
     "has_real_stats": true
   },
   "4576060": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 18.8,
     "pts_per_min": 0.2553,
     "reb_per_min": 0.2872,
@@ -792,7 +792,7 @@
     "has_real_stats": true
   },
   "4433287": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 31.0,
     "pts_per_min": 0.6645,
     "reb_per_min": 0.1613,
@@ -801,7 +801,7 @@
     "has_real_stats": true
   },
   "2583632": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 19.2,
     "pts_per_min": 0.2708,
     "reb_per_min": 0.1615,
@@ -810,7 +810,7 @@
     "has_real_stats": true
   },
   "4396971": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 29.5,
     "pts_per_min": 0.5898,
     "reb_per_min": 0.2881,
@@ -819,7 +819,7 @@
     "has_real_stats": true
   },
   "5211176": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 15.1,
     "pts_per_min": 0.457,
     "reb_per_min": 0.2252,
@@ -828,7 +828,7 @@
     "has_real_stats": true
   },
   "3032979": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 29.9,
     "pts_per_min": 0.3411,
     "reb_per_min": 0.1204,
@@ -837,7 +837,7 @@
     "has_real_stats": true
   },
   "4395651": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 17.8,
     "pts_per_min": 0.3933,
     "reb_per_min": 0.1124,
@@ -846,7 +846,7 @@
     "has_real_stats": true
   },
   "4066218": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 19.8,
     "pts_per_min": 0.3535,
     "reb_per_min": 0.197,
@@ -1080,7 +1080,7 @@
     "has_real_stats": true
   },
   "4870562": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 23.8,
     "pts_per_min": 0.3235,
     "reb_per_min": 0.2017,
@@ -1089,7 +1089,7 @@
     "has_real_stats": true
   },
   "5105637": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 14.2,
     "pts_per_min": 0.1479,
     "reb_per_min": 0.2746,
@@ -1098,7 +1098,7 @@
     "has_real_stats": true
   },
   "3917376": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 34.9,
     "pts_per_min": 0.616,
     "reb_per_min": 0.1862,
@@ -1107,7 +1107,7 @@
     "has_real_stats": true
   },
   "2581018": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 21.4,
     "pts_per_min": 0.2477,
     "reb_per_min": 0.1121,
@@ -1116,7 +1116,7 @@
     "has_real_stats": true
   },
   "5124612": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 33.5,
     "pts_per_min": 0.3791,
     "reb_per_min": 0.1881,
@@ -1125,7 +1125,7 @@
     "has_real_stats": true
   },
   "3059318": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 31.8,
     "pts_per_min": 0.5566,
     "reb_per_min": 0.2925,
@@ -1134,7 +1134,7 @@
     "has_real_stats": true
   },
   "4871141": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 9.2,
     "pts_per_min": 0.2391,
     "reb_per_min": 0.3152,
@@ -1143,7 +1143,7 @@
     "has_real_stats": true
   },
   "1966": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 32.6,
     "pts_per_min": 0.4632,
     "reb_per_min": 0.2209,
@@ -1152,7 +1152,7 @@
     "has_real_stats": true
   },
   "4431678": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 36.3,
     "pts_per_min": 0.7355,
     "reb_per_min": 0.0964,
@@ -1161,7 +1161,7 @@
     "has_real_stats": true
   },
   "4351851": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 21.6,
     "pts_per_min": 0.4491,
     "reb_per_min": 0.1019,
@@ -1170,7 +1170,7 @@
     "has_real_stats": true
   },
   "3912848": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 24.4,
     "pts_per_min": 0.1516,
     "reb_per_min": 0.1516,
@@ -1179,7 +1179,7 @@
     "has_real_stats": true
   },
   "4432446": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 11.4,
     "pts_per_min": 0.4298,
     "reb_per_min": 0.3333,
@@ -1188,7 +1188,7 @@
     "has_real_stats": true
   },
   "4593125": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 15.7,
     "pts_per_min": 0.6369,
     "reb_per_min": 0.3185,
@@ -1197,7 +1197,7 @@
     "has_real_stats": true
   },
   "4432582": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 19.6,
     "pts_per_min": 0.2806,
     "reb_per_min": 0.1531,
@@ -1206,7 +1206,7 @@
     "has_real_stats": true
   },
   "4896372": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 16.4,
     "pts_per_min": 0.439,
     "reb_per_min": 0.1951,
@@ -1215,7 +1215,7 @@
     "has_real_stats": true
   },
   "5279129": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 11.5,
     "pts_per_min": 0.4609,
     "reb_per_min": 0.1739,
@@ -1224,7 +1224,7 @@
     "has_real_stats": true
   },
   "5041939": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 34.1,
     "pts_per_min": 0.7595,
     "reb_per_min": 0.2023,
@@ -1233,7 +1233,7 @@
     "has_real_stats": true
   },
   "4278049": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 21.9,
     "pts_per_min": 0.4384,
     "reb_per_min": 0.2511,
@@ -1242,7 +1242,7 @@
     "has_real_stats": true
   },
   "6442": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 30.4,
     "pts_per_min": 0.7533,
     "reb_per_min": 0.1053,
@@ -1251,7 +1251,7 @@
     "has_real_stats": true
   },
   "4873153": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 17.0,
     "pts_per_min": 0.4471,
     "reb_per_min": 0.3,
@@ -1260,7 +1260,7 @@
     "has_real_stats": true
   },
   "4683688": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 16.4,
     "pts_per_min": 0.2622,
     "reb_per_min": 0.3232,
@@ -1269,7 +1269,7 @@
     "has_real_stats": true
   },
   "4278594": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 24.8,
     "pts_per_min": 0.4476,
     "reb_per_min": 0.121,
@@ -1278,7 +1278,7 @@
     "has_real_stats": true
   },
   "3138160": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 18.4,
     "pts_per_min": 0.1957,
     "reb_per_min": 0.125,
@@ -1287,7 +1287,7 @@
     "has_real_stats": true
   },
   "5211175": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 24.2,
     "pts_per_min": 0.2934,
     "reb_per_min": 0.2025,
@@ -1296,7 +1296,7 @@
     "has_real_stats": true
   },
   "4432107": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 16.4,
     "pts_per_min": 0.3598,
     "reb_per_min": 0.0671,
@@ -1305,7 +1305,7 @@
     "has_real_stats": true
   },
   "4278078": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 33.6,
     "pts_per_min": 0.4345,
     "reb_per_min": 0.2232,
@@ -1836,7 +1836,7 @@
     "has_real_stats": true
   },
   "4433134": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 33.3,
     "pts_per_min": 0.7057,
     "reb_per_min": 0.2282,
@@ -1845,34 +1845,34 @@
     "has_real_stats": true
   },
   "4395625": {
-    "date": "2026-11-12",
-    "avg_minutes": 33.3,
-    "pts_per_min": 0.6396,
-    "reb_per_min": 0.1742,
-    "ast_per_min": 0.1111,
+    "date": "2026-11-13",
+    "avg_minutes": 33.2,
+    "pts_per_min": 0.6175,
+    "reb_per_min": 0.1807,
+    "ast_per_min": 0.1205,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "4431893": {
-    "date": "2026-11-12",
-    "avg_minutes": 18.2,
-    "pts_per_min": 0.5,
-    "reb_per_min": 0.0824,
-    "ast_per_min": 0.0275,
+    "date": "2026-11-13",
+    "avg_minutes": 18.7,
+    "pts_per_min": 0.5027,
+    "reb_per_min": 0.0802,
+    "ast_per_min": 0.0267,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "5149115": {
-    "date": "2026-11-12",
-    "avg_minutes": 13.2,
-    "pts_per_min": 0.3182,
-    "reb_per_min": 0.1818,
-    "ast_per_min": 0.0606,
+    "date": "2026-11-13",
+    "avg_minutes": 13.7,
+    "pts_per_min": 0.365,
+    "reb_per_min": 0.1898,
+    "ast_per_min": 0.0511,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "6450": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 26.0,
     "pts_per_min": 0.75,
     "reb_per_min": 0.2885,
@@ -1881,38 +1881,38 @@
     "has_real_stats": true
   },
   "5093267": {
-    "date": "2026-11-12",
-    "avg_minutes": 22.1,
-    "pts_per_min": 0.4842,
-    "reb_per_min": 0.2262,
-    "ast_per_min": 0.0588,
+    "date": "2026-11-13",
+    "avg_minutes": 21.9,
+    "pts_per_min": 0.4612,
+    "reb_per_min": 0.2237,
+    "ast_per_min": 0.0685,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "3134908": {
-    "date": "2026-11-12",
-    "avg_minutes": 22.8,
-    "pts_per_min": 0.3728,
-    "reb_per_min": 0.2851,
-    "ast_per_min": 0.057,
+    "date": "2026-11-13",
+    "avg_minutes": 23.8,
+    "pts_per_min": 0.3445,
+    "reb_per_min": 0.2857,
+    "ast_per_min": 0.0504,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "4395724": {
-    "date": "2026-11-12",
-    "avg_minutes": 31.8,
-    "pts_per_min": 0.5472,
-    "reb_per_min": 0.1101,
-    "ast_per_min": 0.1824,
+    "date": "2026-11-13",
+    "avg_minutes": 31.3,
+    "pts_per_min": 0.5335,
+    "reb_per_min": 0.115,
+    "ast_per_min": 0.1789,
     "minutes_cap": null,
     "has_real_stats": true
   },
   "4432241": {
-    "date": "2026-11-12",
-    "avg_minutes": 24.3,
-    "pts_per_min": 0.3045,
-    "reb_per_min": 0.0905,
-    "ast_per_min": 0.2881,
+    "date": "2026-11-13",
+    "avg_minutes": 24.1,
+    "pts_per_min": 0.2905,
+    "reb_per_min": 0.0954,
+    "ast_per_min": 0.2863,
     "minutes_cap": null,
     "has_real_stats": true
   },
@@ -1926,11 +1926,11 @@
     "has_real_stats": true
   },
   "4684272": {
-    "date": "2026-11-12",
-    "avg_minutes": 29.6,
-    "pts_per_min": 0.3716,
-    "reb_per_min": 0.1419,
-    "ast_per_min": 0.0743,
+    "date": "2026-11-13",
+    "avg_minutes": 30.1,
+    "pts_per_min": 0.3821,
+    "reb_per_min": 0.1362,
+    "ast_per_min": 0.0698,
     "minutes_cap": null,
     "has_real_stats": true
   },
@@ -2052,7 +2052,7 @@
     "has_real_stats": true
   },
   "4432816": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 27.7,
     "pts_per_min": 0.6606,
     "reb_per_min": 0.1191,
@@ -2061,7 +2061,7 @@
     "has_real_stats": true
   },
   "5279133": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 16.4,
     "pts_per_min": 0.3415,
     "reb_per_min": 0.378,
@@ -2070,7 +2070,7 @@
     "has_real_stats": true
   },
   "4432247": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 14.1,
     "pts_per_min": 0.3333,
     "reb_per_min": 0.1348,
@@ -2079,7 +2079,7 @@
     "has_real_stats": true
   },
   "3934673": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 30.4,
     "pts_per_min": 0.4013,
     "reb_per_min": 0.1349,
@@ -2088,7 +2088,7 @@
     "has_real_stats": true
   },
   "4397002": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 31.4,
     "pts_per_min": 0.5764,
     "reb_per_min": 0.1561,
@@ -2097,7 +2097,7 @@
     "has_real_stats": true
   },
   "4594268": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 33.8,
     "pts_per_min": 0.9852,
     "reb_per_min": 0.142,
@@ -2106,7 +2106,7 @@
     "has_real_stats": true
   },
   "3032976": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 29.9,
     "pts_per_min": 0.2609,
     "reb_per_min": 0.4047,
@@ -2115,7 +2115,7 @@
     "has_real_stats": true
   },
   "4592492": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 12.3,
     "pts_per_min": 0.6911,
     "reb_per_min": 0.1057,
@@ -2124,7 +2124,7 @@
     "has_real_stats": true
   },
   "4433247": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 30.7,
     "pts_per_min": 0.4007,
     "reb_per_min": 0.1792,
@@ -2133,7 +2133,7 @@
     "has_real_stats": true
   },
   "3136196": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 18.5,
     "pts_per_min": 0.3459,
     "reb_per_min": 0.2324,
@@ -2142,7 +2142,7 @@
     "has_real_stats": true
   },
   "4431671": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 33.8,
     "pts_per_min": 0.503,
     "reb_per_min": 0.1805,
@@ -2151,7 +2151,7 @@
     "has_real_stats": true
   },
   "4432847": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 21.5,
     "pts_per_min": 0.5163,
     "reb_per_min": 0.1628,
@@ -3366,7 +3366,7 @@
     "has_real_stats": true
   },
   "3908845": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 26.5,
     "pts_per_min": 0.4038,
     "reb_per_min": 0.2302,
@@ -3375,7 +3375,7 @@
     "has_real_stats": true
   },
   "4432166": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 33.2,
     "pts_per_min": 0.6717,
     "reb_per_min": 0.1566,
@@ -3384,7 +3384,7 @@
     "has_real_stats": true
   },
   "4433621": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 19.0,
     "pts_per_min": 0.6842,
     "reb_per_min": 0.3947,
@@ -3393,7 +3393,7 @@
     "has_real_stats": true
   },
   "2596112": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 17.5,
     "pts_per_min": 0.3543,
     "reb_per_min": 0.1371,
@@ -3402,7 +3402,7 @@
     "has_real_stats": true
   },
   "4683771": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 15.5,
     "pts_per_min": 0.3355,
     "reb_per_min": 0.2194,
@@ -3411,7 +3411,7 @@
     "has_real_stats": true
   },
   "4066372": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 23.1,
     "pts_per_min": 0.381,
     "reb_per_min": 0.1082,
@@ -3420,7 +3420,7 @@
     "has_real_stats": true
   },
   "5107199": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 26.0,
     "pts_per_min": 0.4885,
     "reb_per_min": 0.1385,
@@ -3429,7 +3429,7 @@
     "has_real_stats": true
   },
   "4395702": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 14.0,
     "pts_per_min": 0.5214,
     "reb_per_min": 0.1214,
@@ -3438,7 +3438,7 @@
     "has_real_stats": true
   },
   "4278562": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 25.9,
     "pts_per_min": 0.4402,
     "reb_per_min": 0.2857,
@@ -3447,7 +3447,7 @@
     "has_real_stats": true
   },
   "3157465": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 30.8,
     "pts_per_min": 0.6039,
     "reb_per_min": 0.0584,
@@ -3456,7 +3456,7 @@
     "has_real_stats": true
   },
   "4684742": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 27.2,
     "pts_per_min": 0.3419,
     "reb_per_min": 0.3088,
@@ -3609,7 +3609,7 @@
     "has_real_stats": true
   },
   "5239590": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 10.5,
     "pts_per_min": 0.3619,
     "reb_per_min": 0.1619,
@@ -3618,7 +3618,7 @@
     "has_real_stats": true
   },
   "5281370": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 12.6,
     "pts_per_min": 0.2222,
     "reb_per_min": 0.3333,
@@ -3636,11 +3636,11 @@
     "has_real_stats": true
   },
   "4702656": {
-    "date": "2026-11-12",
-    "avg_minutes": 11.1,
-    "pts_per_min": 0.5225,
-    "reb_per_min": 0.1532,
-    "ast_per_min": 0.0991,
+    "date": "2026-11-13",
+    "avg_minutes": 11.6,
+    "pts_per_min": 0.5517,
+    "reb_per_min": 0.1379,
+    "ast_per_min": 0.0862,
     "minutes_cap": null,
     "has_real_stats": true
   },
@@ -3699,7 +3699,7 @@
     "has_real_stats": true
   },
   "2993874": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 8.0,
     "pts_per_min": 0.225,
     "reb_per_min": 0.175,
@@ -3708,7 +3708,7 @@
     "has_real_stats": true
   },
   "5105977": {
-    "date": "2026-11-12",
+    "date": "2026-11-13",
     "avg_minutes": 8.8,
     "pts_per_min": 0.2045,
     "reb_per_min": 0.1705,
