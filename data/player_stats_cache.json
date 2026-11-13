@@ -59,7 +59,7 @@
     "pts_per_min": 0.426,
     "reb_per_min": 0.1191,
     "ast_per_min": 0.1227,
-    "minutes_cap": 21.0,
+    "minutes_cap": null,
     "has_real_stats": true
   },
   "4601023": {
