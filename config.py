@@ -15,10 +15,59 @@ TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "@munetipsfc").strip()  # Canal: https://t.me/munetipsfc
 
 # ==============================================================================
-# 2. API KEYS DE DATOS Y LLM (OPCIONAL, TIER GRATUITO)
+# 2. API KEYS DE DATOS CON ROTACIÓN AUTOMÁTICA Y BLINDAJE DE CRÉDITOS
 # ==============================================================================
-# The Odds API (Plan gratuito: 500 créditos/mes -> https://the-odds-api.com)
-ODDS_API_KEY = os.getenv("ODDS_API_KEY", "").strip()
+# The Odds API (Plan gratuito: 500 créditos/mes por cada API Key -> https://the-odds-api.com)
+# Soporta rotación automática entre múltiples llaves (separadas por coma en ODDS_API_KEYS,
+# variables numeradas ODDS_API_KEY_1..5, ODDS_API_KEY y el pool de respaldo).
+DEFAULT_ODDS_API_KEYS_POOL = [
+    "ddfb2ab97e7c6a3d0e04d20c38206b3b",
+]
+
+
+def obtener_pool_odds_api_keys() -> list[str]:
+    """
+    Construye la lista ordenada y sin duplicados de API Keys disponibles para The Odds API.
+    Permite rotar automáticamente cuando una llave baja de 3 créditos o devuelve HTTP 401/429.
+    """
+    candidatas: list[str] = []
+    # 1. Lista explícita separada por comas en ODDS_API_KEYS
+    multi_env = os.getenv("ODDS_API_KEYS", "").strip()
+    if multi_env:
+        for k in multi_env.split(","):
+            if k.strip():
+                candidatas.append(k.strip())
+
+    # 2. Llaves numeradas ODDS_API_KEY_1 .. ODDS_API_KEY_5
+    for idx in range(1, 6):
+        k_idx = os.getenv(f"ODDS_API_KEY_{idx}", "").strip()
+        if k_idx:
+            candidatas.append(k_idx)
+
+    # 3. Pool activo integrado
+    for k_def in DEFAULT_ODDS_API_KEYS_POOL:
+        if k_def.strip():
+            candidatas.append(k_def.strip())
+
+    # 4. Variable clásica ODDS_API_KEY (admite también varias separadas por coma)
+    single_env = os.getenv("ODDS_API_KEY", "").strip()
+    if single_env:
+        for k in single_env.split(","):
+            if k.strip():
+                candidatas.append(k.strip())
+
+    # Deduplicar preservando orden
+    pool_unico: list[str] = []
+    for k in candidatas:
+        if k not in pool_unico:
+            pool_unico.append(k)
+    return pool_unico
+
+
+ODDS_API_KEYS_POOL = obtener_pool_odds_api_keys()
+ODDS_API_KEY = ODDS_API_KEYS_POOL[0] if ODDS_API_KEYS_POOL else ""
+MIN_CREDITS_PER_GAME_QUERY = 3        # 1 región (us) x 3 mercados = 3 créditos por partido
+LOW_CREDITS_ALERT_THRESHOLD = 18      # Avisar cuando el pool total baje de 18 créditos
 
 # Gemini API (Opcional, Tier Gratuito de Google AI Studio -> 0 costo)
 # Solo se invoca si una apuesta YA superó el filtro matemático (máx ~150 tokens/alerta)

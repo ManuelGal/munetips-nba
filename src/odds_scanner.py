@@ -61,40 +61,117 @@ def _cumple_umbral_catalogo_playdoit(m_key: str, linea: float) -> bool:
     return True
 
 
+def _obtener_pool_llaves() -> list[str]:
+    """
+    Reúne todas las API Keys configuradas (pool dinámico + config.ODDS_API_KEY)
+    sin duplicados para permitir rotación automática ante agotamiento de créditos.
+    """
+    candidatas: list[str] = []
+    if hasattr(config, "obtener_pool_odds_api_keys"):
+        for k in config.obtener_pool_odds_api_keys():
+            if k and k not in candidatas:
+                candidatas.append(k)
+    for k in getattr(config, "ODDS_API_KEYS_POOL", []):
+        if k and k not in candidatas:
+            candidatas.append(k)
+    single_k = getattr(config, "ODDS_API_KEY", "").strip()
+    if single_k:
+        for k in single_k.split(","):
+            ks = k.strip()
+            if ks and ks not in candidatas:
+                candidatas.append(ks)
+    return candidatas
+
+
+def _parsear_creditos_restantes(hdrs: dict, default_val: int = 500) -> int:
+    raw = str((hdrs or {}).get("x-requests-remaining", "")).strip()
+    if not raw or raw == "?":
+        return default_val
+    try:
+        return int(float(raw))
+    except Exception:
+        return default_val
+
+
+def _mascara_key(api_key: str) -> str:
+    if not api_key or len(api_key) < 6:
+        return "***"
+    return f"...{api_key[-4:]}"
+
+
+def _seleccionar_llave_activa(
+    pool_llaves: list[str],
+    costo_por_partido: int = 3,
+    indice_inicial: int = 0,
+) -> tuple[int, Optional[list], int]:
+    """
+    Recorre el pool de API Keys probando el endpoint gratuito `/events` (0 créditos).
+    Si una llave tiene menos de `costo_por_partido` créditos (ej. 2 < 3) o devuelve
+    error 401/429, rota automáticamente a la siguiente llave con saldo disponible.
+    Devuelve: (indice_llave_activa, eventos_api, creditos_restantes_llave)
+    """
+    for idx in range(indice_inicial, len(pool_llaves)):
+        api_key = pool_llaves[idx]
+        url_events = (
+            f"https://api.the-odds-api.com/v4/sports/basketball_nba/events"
+            f"?apiKey={urllib.parse.quote(api_key)}"
+        )
+        try:
+            eventos_api, hdrs = _get_json(url_events)
+            restantes = _parsear_creditos_restantes(hdrs, default_val=500)
+            if restantes < costo_por_partido:
+                print(
+                    f"[ODDS API ROTATOR] Key {_mascara_key(api_key)} sin saldo suficiente "
+                    f"({restantes} < {costo_por_partido} créditos). Rotando a la siguiente API Key..."
+                )
+                continue
+            if isinstance(eventos_api, list):
+                print(
+                    f"[ODDS API] Eventos NBA leídos con Key {_mascara_key(api_key)} "
+                    f"({idx + 1}/{len(pool_llaves)}). Créditos gratuitos restantes en esta llave: {restantes}"
+                )
+                return idx, eventos_api, restantes
+        except Exception as exc:
+            print(
+                f"[ODDS API ROTATOR] Error en Key {_mascara_key(api_key)} ({exc}). "
+                f"Rotando a la siguiente API Key..."
+            )
+            continue
+
+    return -1, None, 0
+
+
 def escanear_mercados_reales(
     partidos: list[NBAGameContext],
 ) -> list[PropEvaluationResult]:
     """
     Consulta The Odds API (`regions=us` = 3 créditos por partido en vez de 6) para los partidos
-    NBA de hoy y evalúa ventajas reales entre nuestro Modelo Estadístico Independiente + Reglas Playdoit,
-    el Consenso Sharp y las líneas rezagadas en casas recreativas.
+    NBA de hoy con Rotación Automática de API Keys y Blindaje Inteligente de Créditos v2.2.
     """
-    if not config.ODDS_API_KEY:
-        print("[INFO] Sin ODDS_API_KEY configurada.")
+    pool_llaves = _obtener_pool_llaves()
+    if not pool_llaves:
+        print("[INFO] Sin ODDS_API_KEY configurada en el pool.")
         return []
 
-    url_events = (
-        f"https://api.the-odds-api.com/v4/sports/basketball_nba/events"
-        f"?apiKey={urllib.parse.quote(config.ODDS_API_KEY)}"
+    costo_por_partido = max(1, len(getattr(config, "TARGET_MARKETS", ["player_points"])))
+    idx_llave, eventos_api, restantes_actual = _seleccionar_llave_activa(
+        pool_llaves, costo_por_partido=costo_por_partido, indice_inicial=0
     )
-    try:
-        eventos_api, hdrs = _get_json(url_events)
-        restantes = hdrs.get("x-requests-remaining", "?")
-        print(f"[ODDS API] Eventos NBA leídos. Créditos gratuitos restantes este mes: {restantes}")
-    except Exception as exc:
-        print(f"[ERROR] No se pudo conectar a The Odds API: {exc}")
-        return []
-
-    if not isinstance(eventos_api, list):
+    if idx_llave < 0 or not isinstance(eventos_api, list):
+        print(
+            "[ALERTA CRÉDITOS] Ninguna API Key del pool tiene créditos suficientes (>= 3) "
+            "para consultar Player Props hoy."
+        )
         return []
 
     oportunidades: list[PropEvaluationResult] = []
     mercados_str = ",".join(config.TARGET_MARKETS)
     eventos_visitados: set[str] = set()
     now_utc = datetime.now(timezone.utc)
+    es_ventana_manana = 13 <= now_utc.hour <= 21
 
     for ctx in partidos:
-        # Protector de créditos: Omitir partidos que ya comenzaron
+        # 1. Blindaje de créditos: Omitir partidos que ya comenzaron
         if ctx.start_time_utc:
             try:
                 t_ctx = datetime.fromisoformat(ctx.start_time_utc.replace("Z", "+00:00"))
@@ -103,8 +180,28 @@ def escanear_mercados_reales(
             except Exception:
                 pass
 
+        # 2. Blindaje matutino en carteleras grandes (> 4 partidos)
         if not ctx.newly_out_starters and abs(ctx.home_spread) < 9.5 and len(partidos) > 4:
             continue
+
+        # 3. Blindaje vespertino/nocturno sincronizado con model_poisson.py:
+        #    Fuera de la ventana de apertura (13:00-21:59 UTC), el modelo exige catalizador nuevo
+        #    (baja recién confirmada `is_newly_out` o restricción médica `minutes_cap_news`).
+        #    Si el partido no tiene ninguno de los dos, ahorramos los 3 créditos sin llamar a la API.
+        if not es_ventana_manana:
+            tiene_baja_nueva_partido = any(
+                getattr(b, "is_newly_out", False) for b in (ctx.newly_out_starters or [])
+            )
+            tiene_restriccion_partido = any(
+                bool(getattr(p, "minutes_cap_news", None))
+                for p in (ctx.active_players or {}).values()
+            )
+            if not (tiene_baja_nueva_partido or tiene_restriccion_partido):
+                print(
+                    f"[BLINDAJE CRÉDITOS] Omitiendo {ctx.away_team}@{ctx.home_team} en ventana "
+                    f"vespertina (0 bajas nuevas / 0 restricciones de minutos -> ahorro de {costo_por_partido} créditos)."
+                )
+                continue
 
         ev_id = None
         h_full_target = ctx.home_team_full.lower().strip()
@@ -119,6 +216,9 @@ def escanear_mercados_reales(
                 try:
                     t_comm = datetime.fromisoformat(commence_str.replace("Z", "+00:00"))
                     if t_comm <= now_utc:
+                        continue
+                    # Evitar emparejar partidos de mañana listados anticipadamente (> 18 horas)
+                    if (t_comm - now_utc).total_seconds() > 18 * 3600:
                         continue
                 except Exception:
                     pass
@@ -140,14 +240,52 @@ def escanear_mercados_reales(
             continue
 
         eventos_visitados.add(ev_id)
-        url_props = (
-            f"https://api.the-odds-api.com/v4/sports/basketball_nba/events/{ev_id}/odds"
-            f"?apiKey={urllib.parse.quote(config.ODDS_API_KEY)}"
-            f"&regions=us&markets={mercados_str}&oddsFormat=decimal"
-        )
-        try:
-            prop_data, _ = _get_json(url_props)
-        except Exception:
+
+        # 4. Consulta de cuotas con Failover / Rotación en vivo si la llave actual se agota a mitad de jornada
+        prop_data = None
+        while idx_llave < len(pool_llaves):
+            if restantes_actual < costo_por_partido:
+                print(
+                    f"[ODDS API ROTATOR] Key {_mascara_key(pool_llaves[idx_llave])} bajó a "
+                    f"{restantes_actual} créditos (< {costo_por_partido}). Rotando en vivo..."
+                )
+                idx_llave, _, restantes_actual = _seleccionar_llave_activa(
+                    pool_llaves,
+                    costo_por_partido=costo_por_partido,
+                    indice_inicial=idx_llave + 1,
+                )
+                if idx_llave < 0:
+                    break
+
+            llave_actual = pool_llaves[idx_llave]
+            url_props = (
+                f"https://api.the-odds-api.com/v4/sports/basketball_nba/events/{ev_id}/odds"
+                f"?apiKey={urllib.parse.quote(llave_actual)}"
+                f"&regions=us&markets={mercados_str}&oddsFormat=decimal"
+            )
+            try:
+                prop_data, hdrs_prop = _get_json(url_props)
+                restantes_actual = _parsear_creditos_restantes(
+                    hdrs_prop, default_val=max(0, restantes_actual - costo_por_partido)
+                )
+                break
+            except Exception as exc:
+                print(
+                    f"[ODDS API WARN] Falló consulta de props con Key {_mascara_key(llave_actual)} "
+                    f"({exc}). Intentando rotar a la siguiente llave del pool..."
+                )
+                idx_llave, _, restantes_actual = _seleccionar_llave_activa(
+                    pool_llaves,
+                    costo_por_partido=costo_por_partido,
+                    indice_inicial=idx_llave + 1,
+                )
+                if idx_llave < 0:
+                    break
+
+        if not isinstance(prop_data, dict):
+            if idx_llave < 0:
+                print("[ALERTA CRÉDITOS] Se agotaron todas las llaves del pool a mitad del escaneo.")
+                break
             continue
 
         oportunidades.extend(_procesar_libro_evento(ctx, prop_data))

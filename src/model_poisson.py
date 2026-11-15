@@ -573,12 +573,14 @@ def evaluar_oportunidad_prop(
     blended_void_over = (peso_modelo * model_void_over) + ((1.0 - peso_modelo) * sharp_void_over)
     blended_win_under = (peso_modelo * model_win_under) + ((1.0 - peso_modelo) * sharp_win_under)
 
-    # Regla de Horario (Mañana vs. Tarde):
-    # - En la Mañana (7:00 AM a 11:59 AM CDMX = 13:00 a 17:59 UTC): se cazan aperturas con valor.
-    # - En la Tarde (después de las 12:00 PM CDMX): el mercado ya ajustó las aperturas; SOLO se dispara
-    #   si hay una baja recién confirmada (tiene_baja_reciente), tope de minutos nuevo, o línea atrasada >= 0.5 pts.
+    # Regla de Horario (Mañana/Apertura vs. Tarde/Pre-Tipoff):
+    # - En la Ventana de Apertura (7:00 AM a 3:59 PM CDMX = 13:00 a 21:59 UTC, absorbiendo retrasos
+    #   de cola en GitHub Actions del cron de las 17:15 UTC): se cazan aperturas con valor.
+    # - En la Tarde/Noche (a partir de las 4:00 PM CDMX = 22:00+ UTC): el mercado ya ajustó aperturas;
+    #   SOLO se dispara si hay una baja recién confirmada (tiene_baja_reciente), tope de minutos nuevo,
+    #   o línea atrasada >= 0.5 pts.
     hora_utc = datetime.now(timezone.utc).hour
-    es_ventana_manana = 13 <= hora_utc <= 17
+    es_ventana_manana = 13 <= hora_utc <= 21
     hay_desfase_de_linea = abs(sharp_line - playdoit_line) >= 0.5
     hay_catalizador_nuevo = bool(tiene_baja_reciente or inp.minutes_cap_news)
 

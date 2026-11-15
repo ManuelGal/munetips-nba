@@ -477,6 +477,58 @@ def test_suite_9_blindaje_v2_1_anti_sobreproyeccion():
     )
 
 
+def test_suite_10_rotacion_api_keys_y_blindaje_creditos():
+    print("\n--- SUITE 10: Rotación Automática de API Keys y Blindaje de Créditos v2.2 ---")
+    print("Objetivo: Validar pool multi-key, rotación automática ante saldo < 3 créditos y ahorro vespertino.")
+    import src.odds_scanner as scanner
+
+    # 1. Pool de API Keys disponible y sin duplicados
+    pool = scanner._obtener_pool_llaves()
+    assert_test(
+        f"Pool de API Keys activo y cargado sin duplicados (llaves en pool: {len(pool)})",
+        len(pool) >= 1 and len(pool) == len(set(pool)),
+        f"Pool inválido: {pool}"
+    )
+
+    # 2. Simulación de rotación automática cuando Key #1 tiene 2 créditos (< 3 requeridos) y Key #2 tiene 500
+    orig_get_json = scanner._get_json
+    try:
+        def mock_get_json(url: str):
+            if "key_agotada_2_cred" in url:
+                return [{"id": "ev1"}], {"x-requests-remaining": "2"}
+            if "key_fresca_500_cred" in url:
+                return [{"id": "ev1"}], {"x-requests-remaining": "500"}
+            raise RuntimeError("HTTP 401 Unauthorized")
+
+        scanner._get_json = mock_get_json
+        idx_sel, evs_sel, cred_sel = scanner._seleccionar_llave_activa(
+            ["key_error_401", "key_agotada_2_cred", "key_fresca_500_cred"],
+            costo_por_partido=3,
+            indice_inicial=0,
+        )
+        assert_test(
+            f"Rotador salta llave con error 401 y llave con 2 créditos (< 3), activando Key #3 con {cred_sel} créditos",
+            idx_sel == 2 and cred_sel == 500 and isinstance(evs_sel, list),
+            f"idx_sel={idx_sel}, cred_sel={cred_sel}"
+        )
+    finally:
+        scanner._get_json = orig_get_json
+
+    # 3. Verificar blindaje vespertino en código de odds_scanner.py
+    with open(BASE_DIR / "src" / "odds_scanner.py", "r", encoding="utf-8") as f:
+        codigo_sc = f.read()
+    tiene_blindaje_vesp = (
+        "tiene_baja_nueva_partido" in codigo_sc
+        and "tiene_restriccion_partido" in codigo_sc
+        and "[BLINDAJE CRÉDITOS]" in codigo_sc
+    )
+    assert_test(
+        "odds_scanner.py aplica blindaje vespertino pre-llamada (ahorra 3 créditos/partido si no hay catalizador nuevo)",
+        tiene_blindaje_vesp,
+        "Falta el blindaje pre-llamada vespertino en odds_scanner.py"
+    )
+
+
 def main():
     print(f"\n=========================================================================================")
     print(f"🤖 REPORTE DE AUDITORÍA INDEPENDIENTE PARA TERCERA IA — MUNETIPS NBA QUANT PIPELINE")
@@ -493,6 +545,7 @@ def main():
     test_suite_7_integridad_bookmarklet()
     test_suite_8_parches_consenso_red_team()
     test_suite_9_blindaje_v2_1_anti_sobreproyeccion()
+    test_suite_10_rotacion_api_keys_y_blindaje_creditos()
     
     print("\n=========================================================================================")
     pct = (pruebas_pasadas / total_pruebas) * 100.0 if total_pruebas > 0 else 0
