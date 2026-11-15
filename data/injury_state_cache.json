@@ -637,7 +637,7 @@
     "last_out_date": null
   },
   "joel embiid": {
-    "status": "OUT",
+    "status": "QUESTIONABLE",
     "last_out_date": "2026-11-15"
   },
   "tacko fall": {
@@ -689,7 +689,7 @@
     "last_out_date": "2026-11-15"
   },
   "max christie": {
-    "status": "QUESTIONABLE",
+    "status": "OUT",
     "last_out_date": "2026-11-15"
   },
   "moussa cisse": {
@@ -717,8 +717,8 @@
     "last_out_date": null
   },
   "kyrie irving": {
-    "status": "QUESTIONABLE",
-    "last_out_date": null
+    "status": "OUT",
+    "last_out_date": "2026-11-15"
   },
   "morez johnson": {
     "status": "ACTIVE",
@@ -1547,7 +1547,7 @@
     "last_out_date": null
   },
   "andrew nembhard": {
-    "status": "OUT",
+    "status": "QUESTIONABLE",
     "last_out_date": "2026-11-15"
   },
   "aaron nesmith": {
