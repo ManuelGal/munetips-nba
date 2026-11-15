@@ -709,8 +709,8 @@
     "last_out_date": null
   },
   "daniel gafford": {
-    "status": "ACTIVE",
-    "last_out_date": null
+    "status": "OUT",
+    "last_out_date": "2026-11-15"
   },
   "jett howard": {
     "status": "ACTIVE",
@@ -1186,8 +1186,8 @@
     "last_out_date": null
   },
   "jaylen clark": {
-    "status": "ACTIVE",
-    "last_out_date": null
+    "status": "OUT",
+    "last_out_date": "2026-11-15"
   },
   "donte divincenzo": {
     "status": "OUT",
@@ -1992,7 +1992,7 @@
     "last_out_date": null
   },
   "duncan robinson": {
-    "status": "ACTIVE",
+    "status": "QUESTIONABLE",
     "last_out_date": null
   },
   "tolu smith": {
