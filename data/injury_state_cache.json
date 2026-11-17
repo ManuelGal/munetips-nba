@@ -16,7 +16,7 @@
     "last_out_date": null
   },
   "ryan dunn": {
-    "status": "ACTIVE",
+    "status": "QUESTIONABLE",
     "last_out_date": null
   },
   "rasheer fleming": {
@@ -60,16 +60,16 @@
     "last_out_date": null
   },
   "drew timme": {
-    "status": "QUESTIONABLE",
+    "status": "ACTIVE",
     "last_out_date": null
   },
   "mark williams": {
     "status": "OUT",
-    "last_out_date": "2026-11-16"
+    "last_out_date": "2026-11-17"
   },
   "paolo banchero": {
     "status": "OUT",
-    "last_out_date": "2026-11-14"
+    "last_out_date": "2026-11-17"
   },
   "desmond bane": {
     "status": "ACTIVE",
@@ -105,7 +105,7 @@
   },
   "jonathan isaac": {
     "status": "OUT",
-    "last_out_date": "2026-11-14"
+    "last_out_date": "2026-11-17"
   },
   "alex morales": {
     "status": "ACTIVE",
@@ -113,11 +113,11 @@
   },
   "izaiyah nelson": {
     "status": "OUT",
-    "last_out_date": "2026-11-14"
+    "last_out_date": "2026-11-17"
   },
   "noah penda": {
     "status": "OUT",
-    "last_out_date": "2026-11-14"
+    "last_out_date": "2026-11-17"
   },
   "jase richardson": {
     "status": "ACTIVE",
@@ -141,7 +141,7 @@
   },
   "jimmy butler": {
     "status": "OUT",
-    "last_out_date": "2026-11-14"
+    "last_out_date": "2026-11-17"
   },
   "lj cryer": {
     "status": "ACTIVE",
@@ -149,7 +149,7 @@
   },
   "stephen curry": {
     "status": "OUT",
-    "last_out_date": "2026-11-14"
+    "last_out_date": "2026-11-17"
   },
   "draymond green": {
     "status": "ACTIVE",
@@ -177,7 +177,7 @@
   },
   "moses moody": {
     "status": "OUT",
-    "last_out_date": "2026-11-14"
+    "last_out_date": "2026-11-17"
   },
   "georges niang": {
     "status": "ACTIVE",
@@ -193,7 +193,7 @@
   },
   "kristaps porzingis": {
     "status": "OUT",
-    "last_out_date": "2026-11-14"
+    "last_out_date": "2026-11-17"
   },
   "will richard": {
     "status": "ACTIVE",
@@ -205,7 +205,7 @@
   },
   "brandon williams": {
     "status": "OUT",
-    "last_out_date": "2026-11-14"
+    "last_out_date": "2026-11-17"
   },
   "bam adebayo": {
     "status": "ACTIVE",
@@ -244,12 +244,12 @@
     "last_out_date": null
   },
   "nikola jovic": {
-    "status": "ACTIVE",
-    "last_out_date": null
+    "status": "OUT",
+    "last_out_date": "2026-11-17"
   },
   "pelle larsson": {
     "status": "OUT",
-    "last_out_date": "2026-11-15"
+    "last_out_date": "2026-11-17"
   },
   "davion mitchell": {
     "status": "ACTIVE",
@@ -353,7 +353,7 @@
   },
   "reece beekman": {
     "status": "OUT",
-    "last_out_date": "2026-11-16"
+    "last_out_date": "2026-11-17"
   },
   "bub carrington": {
     "status": "ACTIVE",
@@ -361,7 +361,7 @@
   },
   "justin champagnie": {
     "status": "OUT",
-    "last_out_date": "2026-11-16"
+    "last_out_date": "2026-11-17"
   },
   "bilal coulibaly": {
     "status": "ACTIVE",
@@ -384,7 +384,7 @@
     "last_out_date": null
   },
   "tre johnson": {
-    "status": "OUT",
+    "status": "ACTIVE",
     "last_out_date": "2026-11-16"
   },
   "tre mann": {
@@ -409,11 +409,11 @@
   },
   "tristan vukcevic": {
     "status": "OUT",
-    "last_out_date": "2026-11-16"
+    "last_out_date": "2026-11-17"
   },
   "jamir watkins": {
     "status": "OUT",
-    "last_out_date": "2026-11-16"
+    "last_out_date": "2026-11-17"
   },
   "trae young": {
     "status": "ACTIVE",
@@ -528,8 +528,8 @@
     "last_out_date": null
   },
   "neemias queta": {
-    "status": "ACTIVE",
-    "last_out_date": null
+    "status": "OUT",
+    "last_out_date": "2026-11-17"
   },
   "mitchell robinson": {
     "status": "ACTIVE",
@@ -556,7 +556,7 @@
     "last_out_date": null
   },
   "jarrett allen": {
-    "status": "OUT",
+    "status": "ACTIVE",
     "last_out_date": "2026-11-15"
   },
   "thomas bryant": {
@@ -565,7 +565,7 @@
   },
   "tristan enaruna": "ACTIVE",
   "james harden": {
-    "status": "OUT",
+    "status": "ACTIVE",
     "last_out_date": "2026-11-15"
   },
   "mario hezonja": {
@@ -574,15 +574,15 @@
   },
   "sam merrill": {
     "status": "OUT",
-    "last_out_date": "2026-11-15"
+    "last_out_date": "2026-11-17"
   },
   "donovan mitchell": {
-    "status": "OUT",
+    "status": "ACTIVE",
     "last_out_date": "2026-11-15"
   },
   "evan mobley": {
     "status": "OUT",
-    "last_out_date": "2026-11-15"
+    "last_out_date": "2026-11-17"
   },
   "norchad omier": {
     "status": "ACTIVE",
@@ -601,24 +601,24 @@
     "last_out_date": null
   },
   "jaylon tyson": {
-    "status": "ACTIVE",
-    "last_out_date": "2026-11-11"
+    "status": "OUT",
+    "last_out_date": "2026-11-17"
   },
   "ernest udeh": {
     "status": "ACTIVE",
     "last_out_date": null
   },
   "peyton watson": {
-    "status": "OUT",
+    "status": "ACTIVE",
     "last_out_date": "2026-11-15"
   },
   "dominick barlow": {
     "status": "OUT",
-    "last_out_date": "2026-11-16"
+    "last_out_date": "2026-11-17"
   },
   "adem bona": {
     "status": "OUT",
-    "last_out_date": "2026-11-16"
+    "last_out_date": "2026-11-17"
   },
   "jaylen brown": {
     "status": "ACTIVE",
@@ -637,7 +637,7 @@
     "last_out_date": null
   },
   "joel embiid": {
-    "status": "QUESTIONABLE",
+    "status": "ACTIVE",
     "last_out_date": "2026-11-15"
   },
   "tacko fall": {
@@ -646,11 +646,11 @@
   },
   "ariel hukporti": {
     "status": "OUT",
-    "last_out_date": "2026-11-16"
+    "last_out_date": "2026-11-17"
   },
   "lebron james": {
-    "status": "ACTIVE",
-    "last_out_date": "2026-11-13"
+    "status": "OUT",
+    "last_out_date": "2026-11-17"
   },
   "caleb love": {
     "status": "ACTIVE",
@@ -837,11 +837,11 @@
     "last_out_date": null
   },
   "zach edey": {
-    "status": "OUT",
+    "status": "ACTIVE",
     "last_out_date": "2026-11-15"
   },
   "jerami grant": {
-    "status": "OUT",
+    "status": "ACTIVE",
     "last_out_date": "2026-11-15"
   },
   "taylor hendricks": {
@@ -850,11 +850,11 @@
   },
   "gg jackson": {
     "status": "OUT",
-    "last_out_date": "2026-11-15"
+    "last_out_date": "2026-11-17"
   },
   "ty jerome": {
     "status": "OUT",
-    "last_out_date": "2026-11-15"
+    "last_out_date": "2026-11-17"
   },
   "karim lopez": {
     "status": "ACTIVE",
@@ -870,10 +870,10 @@
   },
   "scotty pippen": {
     "status": "OUT",
-    "last_out_date": "2026-11-15"
+    "last_out_date": "2026-11-17"
   },
   "quinten post": {
-    "status": "OUT",
+    "status": "ACTIVE",
     "last_out_date": "2026-11-15"
   },
   "olivier maxence prosper": {
@@ -889,8 +889,8 @@
     "last_out_date": null
   },
   "isaiah stewart": {
-    "status": "ACTIVE",
-    "last_out_date": null
+    "status": "OUT",
+    "last_out_date": "2026-11-17"
   },
   "jaylen wells": {
     "status": "ACTIVE",
@@ -1131,7 +1131,7 @@
   },
   "bennedict mathurin": {
     "status": "OUT",
-    "last_out_date": "2026-11-15"
+    "last_out_date": "2026-11-17"
   },
   "karlo matkovic": {
     "status": "ACTIVE",
@@ -1139,7 +1139,7 @@
   },
   "bryce mcgowens": {
     "status": "OUT",
-    "last_out_date": "2026-11-15"
+    "last_out_date": "2026-11-17"
   },
   "yves missi": {
     "status": "ACTIVE",
@@ -1147,11 +1147,11 @@
   },
   "trey murphy": {
     "status": "OUT",
-    "last_out_date": "2026-11-15"
+    "last_out_date": "2026-11-17"
   },
   "dejounte murray": {
     "status": "OUT",
-    "last_out_date": "2026-11-15"
+    "last_out_date": "2026-11-17"
   },
   "jaron pierre": {
     "status": "ACTIVE",
@@ -1171,7 +1171,7 @@
   },
   "trendon watford": {
     "status": "OUT",
-    "last_out_date": "2026-11-15"
+    "last_out_date": "2026-11-17"
   },
   "zion williamson": {
     "status": "ACTIVE",
@@ -1187,11 +1187,11 @@
   },
   "jaylen clark": {
     "status": "OUT",
-    "last_out_date": "2026-11-15"
+    "last_out_date": "2026-11-17"
   },
   "donte divincenzo": {
     "status": "OUT",
-    "last_out_date": "2026-11-15"
+    "last_out_date": "2026-11-17"
   },
   "ayo dosunmu": {
     "status": "ACTIVE",
@@ -1199,7 +1199,7 @@
   },
   "anthony edwards": {
     "status": "OUT",
-    "last_out_date": "2026-11-15"
+    "last_out_date": "2026-11-17"
   },
   "isaiah evans": {
     "status": "ACTIVE",
@@ -1352,7 +1352,7 @@
   },
   "vit krejci": {
     "status": "OUT",
-    "last_out_date": "2026-11-14"
+    "last_out_date": "2026-11-17"
   },
   "damian lillard": {
     "status": "ACTIVE",
@@ -1360,7 +1360,7 @@
   },
   "ja morant": {
     "status": "OUT",
-    "last_out_date": "2026-11-14"
+    "last_out_date": "2026-11-17"
   },
   "micah potter": {
     "status": "ACTIVE",
@@ -1368,7 +1368,7 @@
   },
   "shaedon sharpe": {
     "status": "OUT",
-    "last_out_date": "2026-11-14"
+    "last_out_date": "2026-11-17"
   },
   "john tonje": {
     "status": "ACTIVE",
@@ -1380,7 +1380,7 @@
   },
   "chris youngblood": {
     "status": "OUT",
-    "last_out_date": "2026-11-14"
+    "last_out_date": "2026-11-17"
   },
   "precious achiuwa": {
     "status": "OUT",
@@ -1648,7 +1648,7 @@
   },
   "julian strawther": {
     "status": "OUT",
-    "last_out_date": "2026-11-15"
+    "last_out_date": "2026-11-17"
   },
   "cam whitmore": {
     "status": "ACTIVE",
@@ -1695,7 +1695,7 @@
     "last_out_date": null
   },
   "michael porter": {
-    "status": "OUT",
+    "status": "ACTIVE",
     "last_out_date": "2026-11-15"
   },
   "drake powell": {
@@ -1795,8 +1795,8 @@
     "last_out_date": null
   },
   "steven adams": {
-    "status": "ACTIVE",
-    "last_out_date": "2026-11-14"
+    "status": "OUT",
+    "last_out_date": "2026-11-17"
   },
   "bogdan bogdanovic": {
     "status": "ACTIVE",
@@ -1804,7 +1804,7 @@
   },
   "clint capela": {
     "status": "OUT",
-    "last_out_date": "2026-11-16"
+    "last_out_date": "2026-11-17"
   },
   "quadir copeland": {
     "status": "ACTIVE",
@@ -1823,7 +1823,7 @@
     "last_out_date": null
   },
   "julian phillips": {
-    "status": "ACTIVE",
+    "status": "QUESTIONABLE",
     "last_out_date": null
   },
   "alperen sengun": {
@@ -1847,15 +1847,15 @@
     "last_out_date": null
   },
   "amen thompson": {
-    "status": "ACTIVE",
-    "last_out_date": null
+    "status": "OUT",
+    "last_out_date": "2026-11-17"
   },
   "oscar tshiebwe": {
     "status": "ACTIVE",
     "last_out_date": null
   },
   "fred vanvleet": {
-    "status": "OUT",
+    "status": "ACTIVE",
     "last_out_date": "2026-11-16"
   },
   "riley minix": {
@@ -1868,14 +1868,14 @@
   },
   "tobe awaka": {
     "status": "OUT",
-    "last_out_date": "2026-11-15"
+    "last_out_date": "2026-11-17"
   },
   "matas buzelis": {
     "status": "ACTIVE",
     "last_out_date": null
   },
   "nic claxton": {
-    "status": "OUT",
+    "status": "ACTIVE",
     "last_out_date": "2026-11-15"
   },
   "zach collins": {
@@ -1919,7 +1919,7 @@
     "last_out_date": null
   },
   "jalen smith": {
-    "status": "OUT",
+    "status": "ACTIVE",
     "last_out_date": "2026-11-15"
   },
   "dailyn swain": {
@@ -1932,7 +1932,7 @@
   },
   "caleb wilson": {
     "status": "OUT",
-    "last_out_date": "2026-11-15"
+    "last_out_date": "2026-11-17"
   },
   "john collins": {
     "status": "ACTIVE",
@@ -2081,7 +2081,7 @@
   },
   "richie saunders": {
     "status": "OUT",
-    "last_out_date": "2026-11-15"
+    "last_out_date": "2026-11-17"
   },
   "chris cenac": {
     "status": "ACTIVE",
@@ -2097,7 +2097,7 @@
   },
   "naeqwan tomlin": {
     "status": "OUT",
-    "last_out_date": "2026-11-15"
+    "last_out_date": "2026-11-17"
   },
   "orlando robinson": {
     "status": "ACTIVE",
