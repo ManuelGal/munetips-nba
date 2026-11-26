@@ -164,7 +164,7 @@
     "last_out_date": null
   },
   "yaxel lendeborg": {
-    "status": "QUESTIONABLE",
+    "status": "ACTIVE",
     "last_out_date": null
   },
   "malevy leons": {
@@ -204,7 +204,7 @@
     "last_out_date": null
   },
   "brandon williams": {
-    "status": "OUT",
+    "status": "ACTIVE",
     "last_out_date": "2026-11-26"
   },
   "bam adebayo": {
@@ -621,7 +621,7 @@
     "last_out_date": "2026-11-22"
   },
   "jaylen brown": {
-    "status": "OUT",
+    "status": "QUESTIONABLE",
     "last_out_date": "2026-11-26"
   },
   "kentavious caldwell pope": {
@@ -637,7 +637,7 @@
     "last_out_date": null
   },
   "joel embiid": {
-    "status": "OUT",
+    "status": "QUESTIONABLE",
     "last_out_date": "2026-11-26"
   },
   "tacko fall": {
@@ -837,7 +837,7 @@
     "last_out_date": null
   },
   "zach edey": {
-    "status": "ACTIVE",
+    "status": "QUESTIONABLE",
     "last_out_date": "2026-11-20"
   },
   "jerami grant": {
@@ -1178,7 +1178,7 @@
     "last_out_date": "2026-11-22"
   },
   "lamelo ball": {
-    "status": "ACTIVE",
+    "status": "QUESTIONABLE",
     "last_out_date": null
   },
   "joan beringer": {
@@ -1471,8 +1471,8 @@
     "last_out_date": null
   },
   "deaaron fox": {
-    "status": "QUESTIONABLE",
-    "last_out_date": "2026-11-24"
+    "status": "OUT",
+    "last_out_date": "2026-11-26"
   },
   "jakobi gillespie": {
     "status": "ACTIVE",
@@ -1515,7 +1515,7 @@
     "last_out_date": "2026-11-12"
   },
   "victor wembanyama": {
-    "status": "QUESTIONABLE",
+    "status": "ACTIVE",
     "last_out_date": "2026-11-24"
   },
   "kobe brown": {
@@ -1719,8 +1719,8 @@
     "last_out_date": "2026-11-26"
   },
   "moritz wagner": {
-    "status": "ACTIVE",
-    "last_out_date": null
+    "status": "OUT",
+    "last_out_date": "2026-11-26"
   },
   "danny wolf": {
     "status": "ACTIVE",
@@ -1759,7 +1759,7 @@
     "last_out_date": null
   },
   "andre drummond": {
-    "status": "ACTIVE",
+    "status": "QUESTIONABLE",
     "last_out_date": null
   },
   "josh hart": {
