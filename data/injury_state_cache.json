@@ -717,8 +717,8 @@
     "last_out_date": null
   },
   "kyrie irving": {
-    "status": "QUESTIONABLE",
-    "last_out_date": "2026-11-16"
+    "status": "OUT",
+    "last_out_date": "2026-11-28"
   },
   "morez johnson": {
     "status": "ACTIVE",
@@ -761,8 +761,8 @@
     "last_out_date": null
   },
   "mo bamba": {
-    "status": "QUESTIONABLE",
-    "last_out_date": null
+    "status": "OUT",
+    "last_out_date": "2026-11-28"
   },
   "tony bradley": {
     "status": "ACTIVE",
@@ -789,7 +789,7 @@
     "last_out_date": null
   },
   "jaxson hayes": {
-    "status": "QUESTIONABLE",
+    "status": "ACTIVE",
     "last_out_date": "2026-11-24"
   },
   "harrison ingram": {
@@ -809,7 +809,7 @@
     "last_out_date": null
   },
   "jusuf nurkic": {
-    "status": "OUT",
+    "status": "ACTIVE",
     "last_out_date": "2026-11-28"
   },
   "josh okogie": {
@@ -837,7 +837,7 @@
     "last_out_date": null
   },
   "zach edey": {
-    "status": "QUESTIONABLE",
+    "status": "ACTIVE",
     "last_out_date": "2026-11-20"
   },
   "jerami grant": {
@@ -1102,8 +1102,8 @@
     "last_out_date": null
   },
   "jakobe walter": {
-    "status": "ACTIVE",
-    "last_out_date": null
+    "status": "OUT",
+    "last_out_date": "2026-11-28"
   },
   "saddiq bey": {
     "status": "ACTIVE",
@@ -1170,7 +1170,7 @@
     "last_out_date": null
   },
   "trendon watford": {
-    "status": "OUT",
+    "status": "ACTIVE",
     "last_out_date": "2026-11-28"
   },
   "zion williamson": {
@@ -1277,7 +1277,10 @@
     "status": "ACTIVE",
     "last_out_date": null
   },
-  "lawson lovering": "ACTIVE",
+  "lawson lovering": {
+    "status": "ACTIVE",
+    "last_out_date": null
+  },
   "sandro mamukelashvili": {
     "status": "ACTIVE",
     "last_out_date": null
@@ -1471,7 +1474,7 @@
     "last_out_date": null
   },
   "deaaron fox": {
-    "status": "QUESTIONABLE",
+    "status": "ACTIVE",
     "last_out_date": "2026-11-26"
   },
   "jakobi gillespie": {
@@ -1479,7 +1482,7 @@
     "last_out_date": null
   },
   "dylan harper": {
-    "status": "OUT",
+    "status": "ACTIVE",
     "last_out_date": "2026-11-28"
   },
   "tobias harris": {
